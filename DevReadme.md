@@ -28,3 +28,19 @@
 1. 将同一个指令的编码函数放到 `<operationName>Encoder.asm` 文件下，例如 `AddEncoder.asm`。
 2. 使用 `masm.json` 中的代码片段作为函数的原型，将所有函数统一起来。
 3. 函数的命名方式常见 `AddEncoder.json`。
+
+## 对于寄存器的编号
+
+在每个编码函数中有两个参数 `sourceReg` 和 `destinationReg`。它们表示的是具体是哪个寄存器。
+
+编号方式：
+
+- `EAX`：0
+- `ECX`：1
+- `EDX`：2
+- `EBX`：3
+- `ESP`：4
+- `EBP`：5
+- `ESI`：6
+- `EDI`：7
+- N/A：4294967295
