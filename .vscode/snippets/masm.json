@@ -3,7 +3,7 @@
         "prefix": "encode",
         "body": [
             "$1 proc uses eax ebx ecx edx esi edi,",
-            "    memBase: ptr byte, memScale: dword, memIndex: dword, displacement: dword,",
+            "    memBase: ptr byte, memScale: dword, memIndex: dword, memDisplacement: dword,",
             "    immediateValue: dword, sourceReg: dword, destinationReg: dword,",
             "    writeTo: ptr byte, sizeOut: ptr byte",
             "",
