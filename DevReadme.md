@@ -27,7 +27,7 @@
 
 1. 将同一个指令的编码函数放到 `<operationName>Encoder.asm` 文件下，例如 `AddEncoder.asm`。
 2. 使用 `masm.json` 中的代码片段作为函数的原型，将所有函数统一起来。
-3. 函数的命名方式常见 `AddEncoder.json`。
+3. 函数的命名方式参见 `AddEncoder.asm`。
 
 ## 对于寄存器的编号
 
