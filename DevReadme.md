@@ -6,7 +6,7 @@
 - [ ] SUB
 - [ ] MOV
 - [x] PUSH
-- [ ] POP
+- [x] POP
 - [ ] OR
 - [ ] AND
 - [ ] XOR
@@ -48,3 +48,4 @@
 ## 语法限制
 
 - `push` 指令对寄存器只支持 eax/ebx/ecx/edx/esi/edi/esp/ebp。
+- `pop` 指令对寄存器只支持 eax/ebx/ecx/edx/esi/edi/esp/ebp。

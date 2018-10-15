@@ -56,7 +56,7 @@ PushMem proc uses eax ebx ecx edx esi edi,
     mov ecx, memDisplacement
     mov dword ptr [eax + edx], ecx
     add edx, 4
-    mov [SizeOut], edx
+    mov [sizeOut], edx
     
     ret
 PushMem endp
