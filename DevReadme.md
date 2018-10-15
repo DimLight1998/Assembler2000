@@ -14,13 +14,13 @@
 - [ ] CMP
 - [ ] TEST
 - [ ] LOOP
-- [ ] CALL
-- [ ] RET
+- [x] CALL
+- [x] RETN
 - [ ] JMP
 - [ ] JZ
-- [ ] INC
-- [ ] DEC
-- [ ] NEG
+- [x] INC
+- [x] DEC
+- [x] NEG
 - [ ] LEA
 
 ## 编码指令开发流程
