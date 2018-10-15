@@ -2,10 +2,10 @@
 
 ## 计划实现的指令
 
-- [ ] ADD
+- [x] ADD
 - [ ] SUB
 - [ ] MOV
-- [ ] PUSH
+- [x] PUSH
 - [ ] POP
 - [ ] OR
 - [ ] AND
@@ -44,3 +44,7 @@
 - `ESI`：6
 - `EDI`：7
 - N/A：4294967295
+
+## 语法限制
+
+- `push` 指令对寄存器只支持 eax/ebx/ecx/edx/esi/edi/esp/ebp。

@@ -2,14 +2,6 @@
 .model flat, stdcall
 option casemap:none
 
-include g:\masm32\include\windows.inc
-include g:\masm32\include\kernel32.inc
-include g:\masm32\include\masm32.inc
-include g:\masm32\include\msvcrt.inc
-includelib g:\masm32\lib\kernel32.lib
-includelib g:\masm32\lib\masm32.lib
-includelib g:\masm32\lib\msvcrt.lib
-
 ; return the value of REG in MEM-REG-R/M in al
 RegInMemRegRmValue proc, reg: dword
     .if reg == 0
@@ -31,6 +23,8 @@ RegInMemRegRmValue proc, reg: dword
     .else
         ; reg should be in [0, 8)
         invoke ExitProcess, 1
+
+    ret
 RegInMemRegRmValue endp
 
 ; return the value of scale in SIB in al
@@ -75,3 +69,77 @@ IndexInSibValue proc, index: dword
         invoke ExitProcess, 1
     ret
 IndexInSibValue endp
+
+
+; return MRR in al, note that you need to deal with REG yourself because I have no information
+; return SIB in bl
+; return whether SIB is used in cl, 0 for not used, 1 for used
+EncodeMrrSib proc, memBaseReg: dword, memScale: dword, memIndexReg: dword
+
+    local mrr byte
+    local sib byte
+    mov mrr, 0
+    mov sib, 0
+
+    mov al, 0
+    mov bl, 0
+    mov cl, 0
+
+    .if memBaseReg == -1 && memIndexReg == -1
+        ; displacement only
+        ; MOD = 00, R/M = 101
+        add mrr, 0 + 5
+
+        mov cl, 0
+    .else if memBaseReg != -1 && memIndexReg == -1
+        ; base + displacement, use SIB, set index to 100
+        ; MOD = 10, R/M = 100
+        add mrr, 128 + 4
+        ; scale = 00, index = 100
+        add sib, 0 + 32
+        mov eax, memBaseReg
+        add sib, al
+
+        mov cl, 1
+    .else if memBaseReg == -1 && memIndexReg != -1
+        ; index * scale + displacement
+        ; MOD = 00, R/M = 100
+        add mrr, 0 + 4
+        ; scale is memScale, index is memIndexReg, base = 101
+        mov eax, 0
+        invoke ScaleInSibValue, memScale
+        add mrr, al
+        mov eax, 0
+        invoke IndexInSibValue, memIndex
+        add mrr, al
+        add mrr, 5
+
+        mov cl, 1
+    .else if memBaseReg != -1 && memIndexReg != -1
+        ; base + index * scale + displacement
+        ; MOD = 10, R/M = 100
+        add mrr, 128 + 4
+        ; scale is memScale
+        mov eax, 0
+        invoke ScaleInSibValue, memScale
+        add sib, al
+        ; index is memIndexReg
+        mov eax, 0
+        invoke IndexInSibValue, memIndexReg
+        add sib, al
+        ; base = memBaseReg
+        mov eax, memBaseReg
+        add sib, al
+
+        mov cl, 1
+    .else
+        invoke ExitProcess, 1
+
+    mov eax, 0
+    mov ebx, 0
+
+    mov al, mrr
+    mov bl, sib
+
+    ret
+EncodeMrrSib endp
