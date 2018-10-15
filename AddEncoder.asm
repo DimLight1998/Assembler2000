@@ -121,9 +121,9 @@ AddRegReg proc uses eax ebx ecx edx esi edi,
     add mrr, ecx
     ; write mrr
     mov [writeTo + 1], mrr
-    mov ebx, 3
     
-    mov [sizeOut], ebx
+    ; this operation always has only 2 bytes
+    mov [sizeOut], 2
 
     ret
 AddRegReg endp
@@ -226,10 +226,9 @@ AddRegImm proc uses eax ebx ecx edx esi edi,
 
     ; get opcode
     local opcode: byte
-    .if destinationReg == 0
-        mov opcode, 05h
-    .else
-        mov opcode, 81h
+
+    ; always use 81 for simplicity
+    mov opcode, 81h
 
     ; write opcode
     mov [writeTo], opcode
@@ -238,18 +237,18 @@ AddRegImm proc uses eax ebx ecx edx esi edi,
     local mrr: byte
     mov mrr, 0
 
-    ;MOD = 00, REG = 000, R/M = destinationReg
-    add mrr, 0
+    ; MOD = 11, REG = 000, R/M = destinationReg
+    add mrr, 192
     add mrr, 0
     add mrr, destinationReg
     mov [writeTo + 1], mrr
-    mov ebx, 3
+    mov ebx, 2
 
     ; set up constant
     mov ecx, immediateValue
-    mov [writeTo + 2], ecx
+    mov dword ptr [writeTo + ebx], ecx
 
-    add edx, 4
+    add ebx, 4
     mov [sizeOut], ebx
 
     
@@ -266,10 +265,7 @@ AddMemImm proc uses eax ebx ecx edx esi edi,
 
     ; get opcode
     local opcode: byte
-    .if destinationReg == 0
-        mov opcode, 05h
-    .else
-        mov opcode, 81h
+    mov opcode, 81h
 
     ; write opcode
     mov [writeTo], opcode
