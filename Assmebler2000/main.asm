@@ -1,16 +1,12 @@
-.386
-.model flat, stdcall
-option casemap:none
+include common.inc
+include LineControl.inc
+include Tokenizer.inc
 
-include	windows.inc
-include kernel32.inc
-include user32.inc
-
-.data
-	msg byte "Hello world",0Ah,0
 .code
-
 main proc
-	mov eax,1
+	invoke tmpLoadInput
+	invoke loadLine
+	invoke tmpTestSymbol
+	invoke ExitProcess, 0
 main endp
 end main

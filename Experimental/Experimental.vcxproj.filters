@@ -15,25 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="main.asm">
+    <MASM Include="exp.asm">
       <Filter>源文件</Filter>
     </MASM>
-    <MASM Include="LineControl.asm">
-      <Filter>源文件</Filter>
-    </MASM>
-    <MASM Include="Tokenizer.asm">
+    <MASM Include="another.asm">
       <Filter>源文件</Filter>
     </MASM>
   </ItemGroup>
   <ItemGroup>
     <None Include="common.inc">
-      <Filter>头文件</Filter>
-    </None>
-    <None Include="LineControl.inc">
-      <Filter>头文件</Filter>
-    </None>
-    <None Include="Tokenizer.inc">
-      <Filter>头文件</Filter>
+      <Filter>源文件</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -20,8 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{DEC2E437-CE67-4F1D-96F8-95DD659C372B}</ProjectGuid>
-    <RootNamespace>Assmebler2000</RootNamespace>
+    <ProjectGuid>{41330492-9341-4100-834D-51E5A9A42972}</ProjectGuid>
+    <RootNamespace>Experimental</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -78,16 +78,14 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>D:\masm32\lib</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
+    </Link>
     <MASM>
       <IncludePaths>D:\masm32\include</IncludePaths>
       <UseSafeExceptionHandlers>true</UseSafeExceptionHandlers>
     </MASM>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>D:\masm32\lib</AdditionalLibraryDirectories>
-      <EntryPointSymbol>
-      </EntryPointSymbol>
-    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -126,18 +124,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <MASM Include="LineControl.asm" />
-    <MASM Include="main.asm" />
+    <MASM Include="another.asm" />
+    <MASM Include="exp.asm" />
   </ItemGroup>
   <ItemGroup>
     <None Include="common.inc" />
-    <None Include="LineControl.inc" />
-    <None Include="Tokenizer.inc" />
-  </ItemGroup>
-  <ItemGroup>
-    <MASM Include="Tokenizer.asm">
-      <FileType>Document</FileType>
-    </MASM>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
