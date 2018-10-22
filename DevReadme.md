@@ -12,7 +12,7 @@
 - [ ] XOR
 - [x] NOT
 - [ ] CMP
-- [ ] TEST
+- [x] TEST
 - [ ] LOOP
 - [x] CALL
 - [x] RETN
