@@ -21,6 +21,9 @@ FileNameLength equ 1000
 
 	;inFileName byte FileNameLength dup(?) todo
 	outFileName byte FileNameLength dup(?)
+
+	lineErrorFlag byte ?
+	totalErrorCount dword ?
 .code
 
 ; load a line in lineBuffer
@@ -35,6 +38,13 @@ loadLine proc
 
 		mov ecx, offset lineBuffer
 		add ecx, eax
+
+		.if eax > 0 && byte ptr [ecx - 1] == 10 ; remove line end \n
+			dec eax
+			dec ecx
+			mov byte ptr [ecx], 0
+		.endif
+
 		mov lineEnd, ecx
 
 		inc lineNumber

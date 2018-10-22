@@ -6,7 +6,7 @@ include Tokenizer.inc
 main proc
 	invoke tmpLoadInput
 	invoke loadLine
-	invoke tmpTestSymbol
+	invoke tmpTestTokenize
 	invoke ExitProcess, 0
 main endp
 end main
