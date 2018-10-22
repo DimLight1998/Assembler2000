@@ -10,7 +10,7 @@
 - [ ] OR
 - [ ] AND
 - [ ] XOR
-- [ ] NOT
+- [x] NOT
 - [ ] CMP
 - [ ] TEST
 - [ ] LOOP
