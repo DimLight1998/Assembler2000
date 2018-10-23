@@ -71,8 +71,7 @@ readSymbol proc uses edi, tokenAddr: ptr Token
 	.endw
 	movsx eax, [esi]
 	.if eax == 58 ; :
-		mov al, TOKEN_LABEL
-		mov [edx].tokenType, al
+		mov [edx].tokenType, TOKEN_LABEL
 		inc esi
 	.endif
 	mov [edi], 0 ; end string
@@ -237,7 +236,7 @@ readChar endp
 isString proc
 	assume esi: ptr byte
 	movsx eax, [esi]
-	.if eax == 34
+	.if eax == 34 ; "
 		mov eax, 1
 	.else
 		mov eax, 0
