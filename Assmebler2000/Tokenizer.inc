@@ -15,6 +15,7 @@ TOKEN_MEM_LEFTBRA equ 11
 TOKEN_MEM_RIGHTBRA equ 12
 TOKEN_MEM_COMMA equ 13
 TOKEN_ENDLINE equ 14
+TOKEN_ASSIGN equ 15
 
 Token struct
 	tokenType byte ?

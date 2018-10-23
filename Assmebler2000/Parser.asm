@@ -303,6 +303,34 @@ setLabelLocation proc uses ebx, strAddr: ptr byte
 	ret
 setLabelLocation endp
 
+; return non-zero if error
+assignLine proc
+	local strAddr: ptr byte, value: dword
+	assume esi: ptr Token
+	lea eax, [esi].tokenStr
+	mov strAddr, eax
+	add esi, 2 * type Token
+	invoke readExpression, addr value
+	.if eax ; error
+		ret
+	.endif
+	.if [esi].tokenType != TOKEN_ENDLINE
+.data
+	junkCharAfterAssign byte "junk char after assign", 10, 0
+.code
+		invoke crt_printf, addr junkCharAfterAssign
+		mov eax, 1
+		ret
+	.endif
+	invoke addDefine, strAddr, value
+	.if eax
+		ret
+	.endif
+	mov eax, 0	
+	assume esi: nothing
+	ret
+assignLine endp
+
 parseLine proc uses esi ebx
 	local lineNodeType: byte, lineNodeVal: dword, typeOkay: byte
 	mov esi, offset tokens
@@ -319,7 +347,20 @@ parseLine proc uses esi ebx
 	.if [esi].tokenType == TOKEN_ENDLINE ; empty statement
 		ret
 	.endif
-	; todo: statement symbol = expression
+	; statement symbol = expression
+	.if [esi].tokenType == TOKEN_SYMBOL
+		.if [esi + type Token].tokenType == TOKEN_ASSIGN
+			invoke assignLine
+			.if eax ; error
+				mov lineErrorFlag, 1
+				inc totalErrorCount
+				ret
+			.endif
+			ret
+		.else
+			; do nothing, will report error later
+		.endif
+	.endif
 	mov typeOkay, 1
 	.if [esi].tokenType != TOKEN_SYMBOL
 		mov typeOkay, 0

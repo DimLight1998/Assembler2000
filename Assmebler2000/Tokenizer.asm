@@ -423,6 +423,10 @@ tokenizeLine proc uses esi edi ebx
 			mov [edi].tokenType, TOKEN_DOLLAR
 			inc esi
 			endAndContinue
+		.elseif eax == 61 ; =
+			mov [edi].tokenType, TOKEN_ASSIGN
+			inc esi
+			endAndContinue
 		.elseif eax == 40 ; (
 			mov [edi].tokenType, TOKEN_LEFTBRA
 			inc bracketDepth
