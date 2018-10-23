@@ -1,4 +1,5 @@
-TokenStringLength equ 1000
+TokenStringLength equ 200
+; todo token too long warning
 
 TOKEN_SYMBOL equ 1
 TOKEN_LABEL equ 2
@@ -13,12 +14,15 @@ TOKEN_RIGHTBRA equ 10
 TOKEN_MEM_LEFTBRA equ 11
 TOKEN_MEM_RIGHTBRA equ 12
 TOKEN_MEM_COMMA equ 13
+TOKEN_ENDLINE equ 14
 
 Token struct
 	tokenType byte ?
 	tokenValue dword ?
 	tokenStr byte TokenStringLength dup(?)
 Token ends
+
+externdef tokenSize: dword, tokens: Token
 
 tokenizeLine proto
 tmpTestSymbol proto

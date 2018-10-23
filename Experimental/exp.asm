@@ -1,7 +1,6 @@
 include common.inc
 
 .data
-	a dword 1
 	b dword 2
 	pattern byte "%d",0Ah,0
 	char byte "a"
@@ -9,12 +8,14 @@ include common.inc
 .code
 
 main proc
-	mov eax,0
-	assume ebx: ptr byte
-	mov ebx, offset char
-	movsx eax,[ebx]
-	assume ebx: nothing
-	mov eax, [ebx]
+	a=1
+	invoke crt_printf, addr pattern,a
+	a=2
+	invoke crt_printf, addr pattern, externalVar
 	invoke ExitProcess,0
 main endp
+
+haha proc
+	ret
+haha endp
 end main

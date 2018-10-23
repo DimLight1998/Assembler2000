@@ -24,6 +24,18 @@
     <MASM Include="Tokenizer.asm">
       <Filter>源文件</Filter>
     </MASM>
+    <MASM Include="SymbolDict.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="Parser.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="Expression.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="Glue.asm">
+      <Filter>源文件</Filter>
+    </MASM>
   </ItemGroup>
   <ItemGroup>
     <None Include="common.inc">
@@ -33,6 +45,18 @@
       <Filter>头文件</Filter>
     </None>
     <None Include="Tokenizer.inc">
+      <Filter>头文件</Filter>
+    </None>
+    <None Include="SymbolDict.inc">
+      <Filter>头文件</Filter>
+    </None>
+    <None Include="Parser.inc">
+      <Filter>头文件</Filter>
+    </None>
+    <None Include="Expression.inc">
+      <Filter>头文件</Filter>
+    </None>
+    <None Include="Glue.inc">
       <Filter>头文件</Filter>
     </None>
   </ItemGroup>

@@ -1,0 +1,230 @@
+include common.inc
+include Parser.inc
+include Tokenizer.inc
+include LineControl.inc
+include SymbolDict.inc
+include Expression.inc
+
+.code
+
+switchSegment proc, nodeVal: dword
+	.if nodeVal == DOTDATA
+		mov currentSection, offset dataSection
+	.elseif nodeVal == DOTTEXT
+		mov currentSection, offset textSection
+	.endif
+	mov al, (Token ptr [esi]).tokenType
+	.if al != TOKEN_ENDLINE
+.data
+	junkCharAfterSwitchSectionErr byte "junk char after switch section directive", 10, 0
+.code
+		invoke crt_printf, junkCharAfterSwitchSectionErr
+		mov lineErrorFlag, 1
+		inc totalErrorCount
+	.endif
+	ret
+switchSegment endp
+
+allocateData proc, nodeVal: dword
+	local dataSize: dword, output: dword
+	.if nodeVal == DOTBYTE
+		mov dataSize, 1
+	.elseif nodeVal == DOTINT
+		mov dataSize, 2
+	.elseif nodeVal == DOTLONG
+		mov dataSize, 4
+	.endif
+	assume esi: ptr Token
+	.if [esi].tokenType == TOKEN_ENDLINE ; zero expression
+		ret
+	.endif
+	.while 1
+		invoke readExpression, addr output
+		.if eax ; error
+			mov lineErrorFlag, 1
+			inc totalErrorCount
+			ret
+		.elseif !currentSection
+.data
+	mustAllocateDataInSectionErr byte "must allocate data in a section", 10, 0
+.code
+			invoke crt_printf, addr mustAllocateDataInSectionErr
+			mov lineErrorFlag, 1
+			inc totalErrorCount
+			ret
+		.else
+			invoke writeSectionData, currentSection, output, dataSize
+		.endif
+		.if [esi].tokenType == TOKEN_ENDLINE
+			.break ; line end
+		.elseif [esi].tokenType == TOKEN_COMMA
+			add esi, type Token
+		.else
+.data
+	syntaxErrAllocateData byte "not an end of line nor a comma after an expression", 10, 0
+.code
+			invoke crt_printf, addr syntaxErrAllocateData
+			mov lineErrorFlag, 1
+			inc totalErrorCount
+			ret
+		.endif
+	.endw
+	assume esi: nothing
+	ret
+allocateData endp
+
+allocateString proc uses edi, nodeVal: dword
+	assume esi: ptr Token
+	.if [esi].tokenType == TOKEN_ENDLINE
+		ret ; empty statement
+	.endif
+	.while 1
+		.if [esi].tokenType != TOKEN_STRING
+.data
+	tokenNotAStringErr byte "token is not a string", 10, 0
+.code
+			invoke crt_printf, addr tokenNotAStringErr
+			mov lineErrorFlag, 1
+			inc totalErrorCount
+			ret
+		.elseif !currentSection
+			invoke crt_printf, addr mustAllocateDataInSectionErr
+			mov lineErrorFlag, 1
+			inc totalErrorCount
+			ret
+		.endif
+		lea edi, [esi].tokenStr
+		.while 1
+			movzx eax, byte ptr [edi]
+			.if !eax
+				.break
+			.endif
+			invoke writeSectionData, currentSection, eax, 1
+			inc edi
+		.endw
+		.if nodeVal == DOTASCIZ
+			invoke writeSectionData, currentSection, 0, 1
+		.endif
+		add esi, type Token
+		.if [esi].tokenType == TOKEN_ENDLINE
+			.break ; line end
+		.elseif [esi].tokenType == TOKEN_COMMA
+			add esi, type Token
+		.else
+			invoke crt_printf, addr syntaxErrAllocateData
+			mov lineErrorFlag, 1
+			inc totalErrorCount
+			ret
+		.endif
+	.endw
+	assume esi: nothing
+	ret
+allocateString endp
+
+addDefine proc uses ebx, strAddr: dword, value: dword
+	.if parseCount == 2
+		invoke getOrCreateTrieItem, strAddr
+		assume eax: ptr TrieNode
+		.if [eax].nodeType == TRIE_NULL
+			mov [eax].nodeType, TRIE_VAR
+			mov ebx, value
+			mov [eax].nodeVal, ebx
+		.elseif [eax].nodeType == TRIE_VAR
+			mov ebx, value
+			mov [eax].nodeVal, ebx
+		.else
+.data
+	cannotAssignDefineErr byte "cannot assign define to %s", 10, 0
+.code
+			invoke crt_printf, addr cannotAssignDefineErr, strAddr
+			mov eax, 1
+			ret
+		.endif
+		assume eax: nothing
+	.endif
+	mov eax, 0
+	ret
+addDefine endp
+
+parseLine proc uses esi
+	local lineNodeType: byte, lineNodeVal: dword, typeOkay: byte
+	mov esi, offset tokens
+	assume esi: ptr Token
+	.while [esi].tokenType == TOKEN_LABEL
+		invoke getOrCreateTrieItem, addr [esi].tokenStr
+		assume eax: ptr TrieNode
+		.if [eax].nodeType == TRIE_NULL
+			; set current location todo
+		.else
+.data
+	duplicateLabelDefinitionErr byte "duplicate label definition: %s", 10, 0
+.code
+			invoke crt_printf, addr duplicateLabelDefinitionErr, addr [esi].tokenStr
+			mov lineErrorFlag, 1
+			inc totalErrorCount
+			ret
+		.endif
+		assume eax: nothing
+		add esi, type Token
+	.endw
+	.if [esi].tokenType == TOKEN_ENDLINE ; empty statement
+		ret
+	.endif
+	; todo: statement symbol = expression
+	mov typeOkay, 1
+	.if [esi].tokenType != TOKEN_SYMBOL
+		mov typeOkay, 0
+	.endif
+	assume eax: ptr TrieNode
+	.if typeOkay
+		invoke getTrieItem, addr [esi].tokenStr
+		.if eax == 0
+			mov typeOkay, 0
+		.endif
+	.endif
+	.if typeOkay
+		.if [eax].nodeType != TRIE_INST && [eax].nodeType != TRIE_DIRECTIVE
+			mov typeOkay, 0
+		.endif
+	.endif
+	.if typeOkay
+		mov bl, [eax].nodeType
+		mov lineNodeType, bl
+		mov ebx, [eax].nodeVal
+		mov lineNodeVal, ebx
+		add esi, type Token
+		.if lineNodeVal == DOTDATA || lineNodeVal == DOTTEXT
+			invoke switchSegment, lineNodeVal
+		.elseif lineNodeVal == DOTBYTE || lineNodeVal == DOTINT || lineNodeVal == DOTLONG
+			invoke allocateData, lineNodeVal
+		.elseif lineNodeVal == DOTASCII || lineNodeVal == DOTASCIZ
+			invoke allocateString, lineNodeVal
+		.elseif lineNodeVal == DOTSET || lineNodeVal == DOTEQU
+
+		.elseif lineNodeVal == DOTALIGN
+
+		.elseif lineNodeVal == DOTIMPORT
+
+		.elseif lineNodeType == TRIE_INST
+			
+		.else
+.data
+	impossibleInfo byte "impossible!", 10, 0
+.code
+			invoke crt_printf, addr impossibleInfo
+		.endif
+	.else
+.data
+	unrecognizedInstruction byte "unrecognized instruction at line begin", 10, 0
+.code
+		invoke crt_printf, addr unrecognizedInstruction
+		mov lineErrorFlag, 1
+		inc totalErrorCount
+		ret
+	.endif
+	assume eax: nothing
+	assume esi: nothing
+	ret
+parseLine endp
+
+end

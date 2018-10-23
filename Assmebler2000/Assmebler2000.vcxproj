@@ -126,15 +126,37 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <MASM Include="Expression.asm" />
+    <MASM Include="Glue.asm" />
     <MASM Include="LineControl.asm" />
     <MASM Include="main.asm" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="common.inc" />
-    <None Include="LineControl.inc" />
-    <None Include="Tokenizer.inc" />
+    <ClInclude Include="common.inc">
+      <FileType>Document</FileType>
+    </ClInclude>
+    <ClInclude Include="Expression.inc">
+      <FileType>Document</FileType>
+    </ClInclude>
+    <ClInclude Include="Glue.inc">
+      <FileType>Document</FileType>
+    </ClInclude>
+    <ClInclude Include="LineControl.inc">
+      <FileType>Document</FileType>
+    </ClInclude>
+    <ClInclude Include="Parser.inc">
+      <FileType>Document</FileType>
+    </ClInclude>
+    <ClInclude Include="SymbolDict.inc">
+      <FileType>Document</FileType>
+    </ClInclude>
+    <ClInclude Include="Tokenizer.inc">
+      <FileType>Document</FileType>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <MASM Include="Parser.asm" />
+    <MASM Include="SymbolDict.asm" />
     <MASM Include="Tokenizer.asm">
       <FileType>Document</FileType>
     </MASM>

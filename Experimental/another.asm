@@ -1,6 +1,6 @@
 include common.inc
 
-.data
-externalVar dword 0
+.data?
+externalVar abcd <>
 
 end

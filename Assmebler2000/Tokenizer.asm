@@ -1,13 +1,12 @@
 include common.inc
 include Tokenizer.inc
 include LineControl.inc
+include SymbolDict.inc
 
 MaxToken equ 1000
 
 
 .data?
-	cursor dword ?
-	curToken dword ?
 	tokenSize dword ?
 	tokens Token MaxToken dup(<>)
 	bracketStack dword MaxToken dup(?)
@@ -115,11 +114,12 @@ char2Digit proc, char: dword
 char2Digit endp
 
 readInteger proc uses edi ebx, tokenAddr: ptr Token
+	local overflowFlag: byte
+	mov overflowFlag, 0
 	assume esi: ptr byte
 	mov edx, tokenAddr
 	mov edi, 0 ; value
 	mov ebx, 0 ; base
-	mov ecx, 0 ; overflow?
 	assume edx: ptr Token
 	mov [edx].tokenType, TOKEN_INTEGER
 	invoke char2Digit, [esi]
@@ -158,17 +158,17 @@ readInteger proc uses edi ebx, tokenAddr: ptr Token
 		.else
 			imul edi, ebx
 			.if overflow?
-				mov ecx, 1
+				mov overflowFlag, 1
 			.endif
 			add edi, eax
 			.if overflow?
-				mov ecx, 1
+				mov overflowFlag, 1
 			.endif
 			inc esi
 		.endif
 	.endw
 	mov [edx].tokenValue, edi
-	.if ecx
+	.if overflowFlag
 .data
 	integerOverflowWarn byte "Warning: read integer overflow %d", 10, 0
 .code
@@ -350,6 +350,23 @@ tokenizeLine proc uses esi edi ebx
 			.if eax
 				breakWithError
 			.endif
+			invoke isReg, addr [edi].tokenStr
+			.if eax ; really is a reg
+				.if bracketDepth == 0
+					; do nothing
+				.elseif bracketDepth == 1
+					push esi
+					mov esi, [ebx - 4] ; last left bracket
+					mov (Token ptr [esi]).tokenType, TOKEN_MEM_LEFTBRA
+					pop esi
+				.else
+.data
+	wrongRegBracketDepthErr byte "cannot use %s in bracket depth: %d", 10, 0
+.code
+					invoke crt_printf, addr wrongRegBracketDepthErr, addr [edi].tokenStr, bracketDepth
+					breakWithError
+				.endif
+			.endif
 			endAndContinue
 		.endif
 
@@ -393,7 +410,7 @@ tokenizeLine proc uses esi edi ebx
 .data
 	wrongBracketDepthErr byte "cannot use ',' in bracket depth: %d", 10, 0
 .code
-				invoke crt_printf, addr wrongBracketDepthErr, eax
+				invoke crt_printf, addr wrongBracketDepthErr, bracketDepth
 				breakWithError
 			.endif
 			inc esi
@@ -445,13 +462,15 @@ tokenizeLine proc uses esi edi ebx
 	.endw
 	.if !lineErrorFlag && bracketDepth != 0
 .data
-	unusedRightBracket byte "%d ununsed right bracket(s)", 10, 0
+	unusedLeftBracketErr byte "%d unused left bracket(s)", 10, 0
 .code
-		invoke crt_printf, addr unusedRightBracket, eax
+		invoke crt_printf, addr unusedLeftBracketErr, bracketDepth
 		mov lineErrorFlag, 1
 		inc totalErrorCount
 	.endif
 
+	mov [edi].tokenType, TOKEN_ENDLINE
+	inc tokenSize
 	assume edi: nothing
 	assume esi: nothing
 	ret

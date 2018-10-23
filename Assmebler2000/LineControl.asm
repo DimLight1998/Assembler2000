@@ -1,5 +1,8 @@
 include common.inc
 include LineControl.inc
+include Glue.inc
+include Tokenizer.inc
+include Parser.inc
 
 MaxBufferLength equ 100000
 FileNameLength equ 1000
@@ -8,13 +11,13 @@ FileNameLength equ 1000
 	inMode byte "r", 0
 	outMode byte "w", 0
 	inFileName byte "input.txt", 0
-	lineNumber dword 0
-	errCount dword 0
-
 .data?
 	lineLength dword ? ; line length in bytes
 	lineEnd dword ? ; line end address
 	lineBuffer byte MaxBufferLength dup(?) ; buffer to put in line
+
+	lineNumber dword ?
+	parseCount dword ?
 
 	fin dword ?
 	fout dword ?
@@ -24,6 +27,13 @@ FileNameLength equ 1000
 
 	lineErrorFlag byte ?
 	totalErrorCount dword ?
+
+	dataSection Section <>
+	textSection Section <>
+	currentSection dword ?
+
+	externTries dword MaxLabelInSection dup(?)
+	currentExtern dword ?
 .code
 
 ; load a line in lineBuffer
@@ -48,14 +58,146 @@ loadLine proc
 		mov lineEnd, ecx
 
 		inc lineNumber
+	.else
+		mov eax, -1
 	.endif
 	ret
 loadLine endp
+
+writeSectionData proc uses esi edi eax, sectionAddr: dword, data: dword, dataSize: dword
+	mov esi, sectionAddr
+	assume esi: ptr Section
+	.if dataSize == 1
+		mov eax, data
+		mov edi, [esi].currentCursor
+		mov [edi], al
+		add [esi].currentCursor, 1
+		add [esi].locationCounter, 1
+	.elseif dataSize == 2
+		mov eax, data
+		mov edi, [esi].currentCursor
+		mov [edi], ax
+		add [esi].currentCursor, 2
+		add [esi].locationCounter, 2
+	.elseif dataSize == 4
+		mov eax, data
+		mov edi, [esi].currentCursor
+		mov [edi], eax
+		add [esi].currentCursor, 4
+		add [esi].locationCounter, 4
+	.else
+.data
+	unsupportedDataSize byte "unsupported data size: %d", 10, 0
+.code
+		invoke crt_printf, addr unsupportedDataSize, dataSize
+	.endif
+	assume esi: nothing
+	ret
+writeSectionData endp
+
+initSection proc uses eax esi, sectionAddr: dword, base: dword
+	mov esi, sectionAddr
+	assume esi: ptr Section
+	mov eax, base
+	mov [esi].baseAddress, eax
+	mov [esi].locationCounter, eax
+	lea eax, [esi].labelTries
+	mov [esi].currentTrie, eax
+	lea eax, [esi].sectionContent
+	mov [esi].currentCursor, eax
+	assume esi: nothing
+	ret
+initSection endp
+
+addTrieEntry proc uses esi, sectionAddr: dword, trieEntry: dword
+	mov esi, sectionAddr
+	assume esi: ptr Section
+	mov eax, trieEntry
+	mov [esi].currentTrie, eax
+	add [esi].currentTrie, type dword
+	assume esi: nothing
+	ret
+addTrieEntry endp
 
 tmpLoadInput proc
 	invoke crt_fopen, addr inFileName, addr inMode
 	mov fin, eax
 	ret
 tmpLoadInput endp
+
+parseFile proc
+	mov lineNumber, 0
+	.while 1
+		mov lineErrorFlag, 0
+		invoke loadLine
+		.if eax == -1
+			.break
+		.endif
+		invoke tokenizeLine
+		.if !lineErrorFlag
+			invoke parseLine
+		.endif
+		.if lineErrorFlag
+.data
+	errorOccurLineInfo byte "error occured when parsing line %d", 10, 0
+.code
+			invoke crt_printf, addr errorOccurLineInfo, lineNumber
+		.endif
+	.endw
+	ret
+parseFile endp
+
+; the main procedure
+assemble proc
+; todo: get inFileName, outFileName from command line parameter
+
+; open file
+	invoke crt_fopen, addr inFileName, addr inMode
+	mov fin, eax
+	.if !fin ; null pointer, error
+.data
+	fileNotOpenErr byte "Error: cannot open input file %s", 10, 0
+.code
+		invoke crt_printf, addr fileNotOpenErr, addr inFileName
+		ret
+	.endif
+
+; clear error flags
+	mov totalErrorCount, 0
+
+; first pass
+	invoke initSection, addr dataSection, 0
+	invoke initSection, addr textSection, 0
+	mov currentSection, 0 ; point to nothing
+	mov parseCount, 1
+	invoke parseFile
+	.if totalErrorCount
+.data
+	errOccuredDuringPass byte "%d error occured during pass %d, assemble terminated", 10, 0
+.code
+		invoke crt_printf, addr errOccuredDuringPass, totalErrorCount, parseCount
+		ret
+	.endif
+
+	invoke middleGlue
+
+	invoke crt_fseek, fin, 0, SEEK_SET ; back to beginning
+
+; second pass
+	mov currentSection, 0 ; point to nothing
+	mov parseCount, 2
+	invoke parseFile
+	.if totalErrorCount
+		invoke crt_printf, addr errOccuredDuringPass, totalErrorCount, parseCount
+		ret
+	.endif
+
+	invoke crt_fclose, fin
+	mov fin, 0
+
+	invoke afterGlue
+
+	ret
+assemble endp
 
 end

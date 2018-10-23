@@ -1,1 +1,1 @@
-movl $0,%eax
+mov 4((%ebp)), %eax
