@@ -277,7 +277,7 @@ importLine endp
 setLabelLocation proc uses ebx, strAddr: ptr byte
 .data
 	labelAlreadyUsed byte "label already used: %s", 10, 0
-	mustBeInASection byte "label must be in a section", 10, 0
+	mustBeInASection byte "label must be in a section: %s", 10, 0
 .code
 	.if parseCount == 1
 		invoke getOrCreateTrieItem, strAddr
@@ -303,7 +303,7 @@ setLabelLocation proc uses ebx, strAddr: ptr byte
 	ret
 setLabelLocation endp
 
-parseLine proc uses esi
+parseLine proc uses esi ebx
 	local lineNodeType: byte, lineNodeVal: dword, typeOkay: byte
 	mov esi, offset tokens
 	assume esi: ptr Token
