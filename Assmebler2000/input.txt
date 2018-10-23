@@ -1,1 +1,11 @@
-mov 4((%ebp)), %eax
+.data
+_a:.int 1,2,3
+.b:.byte 3,4,5
+_2333a:hahaha:.long 2147483647,2333333,65536
+.ascii "Fuck","nbide"
+.asciz "oh that's good\"!\'"
+.text
+.import "kernel32.dll",ExitProcess,GetCommandLine
+.set oh, 233
+.equ that, oh
+

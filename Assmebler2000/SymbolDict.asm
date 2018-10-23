@@ -57,38 +57,53 @@ initNode endp
 
 dictPreprocess proc
 	mov trieAllocator, offset trieNodes
-	invoke initNode, trieAllocator
-	add trieAllocator, type dword
+	;invoke initNode, trieAllocator
+	add trieAllocator, type TrieNode ; prevbug: type dword
 	assume eax: ptr TrieNode
-	invoke getOrCreateTrieItem, addr dot_data
-	mov [eax].nodeType, TRIE_DIRECTIVE
-	mov [eax].nodeVal, DOTDATA
 
 	; add regs
-	invoke getOrCreateTrieItem, addr reg_eax
-	mov [eax].nodeType, TRIE_REG
-	mov [eax].nodeVal, 0
-	invoke getOrCreateTrieItem, addr reg_ecx
-	mov [eax].nodeType, TRIE_REG
-	mov [eax].nodeVal, 1
-	invoke getOrCreateTrieItem, addr reg_edx
-	mov [eax].nodeType, TRIE_REG
-	mov [eax].nodeVal, 2
-	invoke getOrCreateTrieItem, addr reg_ebx
-	mov [eax].nodeType, TRIE_REG
-	mov [eax].nodeVal, 3
-	invoke getOrCreateTrieItem, addr reg_esp
-	mov [eax].nodeType, TRIE_REG
-	mov [eax].nodeVal, 4
-	invoke getOrCreateTrieItem, addr reg_ebp
-	mov [eax].nodeType, TRIE_REG
-	mov [eax].nodeVal, 5
-	invoke getOrCreateTrieItem, addr reg_esi
-	mov [eax].nodeType, TRIE_REG
-	mov [eax].nodeVal, 6
-	invoke getOrCreateTrieItem, addr reg_edi
-	mov [eax].nodeType, TRIE_REG
-	mov [eax].nodeVal, 7
+	addSymbol reg_eax, TRIE_REG, 0
+	addSymbol reg_ecx, TRIE_REG, 1
+	addSymbol reg_edx, TRIE_REG, 2
+	addSymbol reg_ebx, TRIE_REG, 3
+	addSymbol reg_esp, TRIE_REG, 4
+	addSymbol reg_ebp, TRIE_REG, 5
+	addSymbol reg_esi, TRIE_REG, 6
+	addSymbol reg_edi, TRIE_REG, 7
+
+	; add directives
+	addSymbol dot_data, TRIE_DIRECTIVE, DOTDATA
+	addSymbol dot_text, TRIE_DIRECTIVE, DOTTEXT
+	addSymbol dot_byte, TRIE_DIRECTIVE, DOTBYTE
+	addSymbol dot_int, TRIE_DIRECTIVE, DOTINT
+	addSymbol dot_long, TRIE_DIRECTIVE, DOTLONG
+	addSymbol dot_ascii, TRIE_DIRECTIVE, DOTASCII
+	addSymbol dot_asciz, TRIE_DIRECTIVE, DOTASCIZ
+	addSymbol dot_set, TRIE_DIRECTIVE, DOTSET
+	addSymbol dot_equ, TRIE_DIRECTIVE, DOTEQU
+	addSymbol dot_import, TRIE_DIRECTIVE, DOTIMPORT
+
+	; add instructions
+	addSymbol ins_addl , TRIE_INST, INSADDL 
+	addSymbol ins_subl , TRIE_INST, INSSUBL 
+	addSymbol ins_movl , TRIE_INST, INSMOVL 
+	addSymbol ins_pushl, TRIE_INST, INSPUSHL
+	addSymbol ins_popl , TRIE_INST, INSPOPL 
+	addSymbol ins_orl  , TRIE_INST, INSORL 
+	addSymbol ins_andl , TRIE_INST, INSANDL 
+	addSymbol ins_xorl , TRIE_INST, INSXORL 
+	addSymbol ins_notl , TRIE_INST, INSNOTL 
+	addSymbol ins_cmpl , TRIE_INST, INSCMPL 
+	addSymbol ins_testl, TRIE_INST, INSTESTL
+	addSymbol ins_loop , TRIE_INST, INSLOOP 
+	addSymbol ins_call , TRIE_INST, INSCALL 
+	addSymbol ins_ret  , TRIE_INST, INSRET 
+	addSymbol ins_jmp  , TRIE_INST, INSJMP 
+	addSymbol ins_jz   , TRIE_INST, INSJZ  
+	addSymbol ins_incl , TRIE_INST, INSINCL 
+	addSymbol ins_decl , TRIE_INST, INSDECL 
+	addSymbol ins_negl , TRIE_INST, INSNEGL 
+	addSymbol ins_leal , TRIE_INST, INSLEAL 
 
 	assume eax: nothing
 	ret
@@ -130,10 +145,10 @@ getOrCreateTrieItem proc uses esi edx ebx ecx, strAddr: dword
 		.endif
 		lea ebx, [edx].nodeChildren
 		.if ! dword ptr [ebx + eax * type dword]
-			invoke initNode, trieAllocator
+			;invoke initNode, trieAllocator
 			mov ecx, trieAllocator
 			mov [ebx + eax * type dword], ecx
-			add trieAllocator, type dword
+			add trieAllocator, type TrieNode ; prevbug: type dword
 		.endif
 		mov edx, [ebx + eax * type dword]
 		inc esi

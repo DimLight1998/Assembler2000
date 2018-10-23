@@ -3,6 +3,7 @@ include LineControl.inc
 include Glue.inc
 include Tokenizer.inc
 include Parser.inc
+include SymbolDict.inc
 
 MaxBufferLength equ 100000
 FileNameLength equ 1000
@@ -150,6 +151,8 @@ parseFile endp
 ; the main procedure
 assemble proc
 ; todo: get inFileName, outFileName from command line parameter
+	
+	invoke dictPreprocess
 
 ; open file
 	invoke crt_fopen, addr inFileName, addr inMode
@@ -170,6 +173,7 @@ assemble proc
 	invoke initSection, addr textSection, 0
 	mov currentSection, 0 ; point to nothing
 	mov parseCount, 1
+	mov currentExtern, offset externTries ; prevbug: forgot to initialize
 	invoke parseFile
 	.if totalErrorCount
 .data

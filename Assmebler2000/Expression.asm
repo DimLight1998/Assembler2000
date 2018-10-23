@@ -7,8 +7,9 @@ include LineControl.inc
 .code
 
 ; return non-zero if error occures
-readExpression proc uses esi ebx, outputAddr: ptr dword ; todo need test
+readExpression proc uses ebx edi, outputAddr: ptr dword ; prevbug: add esi to USES list
 	assume esi: ptr Token
+	mov edi, outputAddr
 	.if [esi].tokenType == TOKEN_SYMBOL || [esi].tokenType == TOKEN_LABEL
 		.if parseCount == 2 ; second pass
 			invoke getTrieItem, addr [esi].tokenStr
@@ -30,14 +31,14 @@ readExpression proc uses esi ebx, outputAddr: ptr dword ; todo need test
 				ret
 			.endif
 			mov eax, (TrieNode ptr [eax]).nodeVal
-			mov outputAddr, eax
+			mov [edi], eax
 		.else ; first pass
-			mov outputAddr, 0 ; dummy value
+			mov dword ptr [edi], 0 ; dummy value
 		.endif
 		add esi, type Token
 	.elseif [esi].tokenType == TOKEN_INTEGER || [esi].tokenType == TOKEN_CHAR
 		mov eax, [esi].tokenValue
-		mov outputAddr, eax
+		mov [edi], eax
 		add esi, type Token
 	.else
 .data

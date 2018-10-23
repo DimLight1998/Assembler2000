@@ -4,9 +4,11 @@ include LineControl.inc
 include SymbolDict.inc
 .code
 
-middleGlue proc uses esi ebx
+middleGlue proc uses esi edi ebx
 .data
 	sectionLengthPrompt byte "this section's length is %d byte(s)", 10, 0
+	dllPrompt byte "dll %s: ", 10, 0
+	symbolPrompt  byte "symbol %s", 10, 0
 .code
 	; get length
 	getSectionLength textSection
@@ -19,17 +21,19 @@ middleGlue proc uses esi ebx
 	addBaseAddr textSection
 	addBaseAddr dataSection
 	; todo set external's address
-.data
-	externalFromPrompt byte "I am %s from %s", 10, 0
-.code
-	;mov esi, offset externTries
-	;assume esi: ptr TrieNode
-	;.while esi != currentExtern
-	;	invoke crt_printf, addr externalFromPrompt, addr [esi].nodeName, addr [esi].nodeStr
-	;	mov [esi].nodeVal, 0 ; demo, you should fill this with its address
-	;	add esi, type dword
-	;.endw
-	assume esi: nothing
+	mov esi, offset externTries
+	assume edi: ptr TrieNode
+	.while esi != currentExtern
+		mov edi, [esi]
+		invoke crt_printf, addr dllPrompt, addr [edi].nodeStr
+		mov edi, [edi].nodeVal
+		.while edi
+			invoke crt_printf, addr symbolPrompt, addr [edi].nodeStr
+			mov edi, [edi].nodeVal
+		.endw
+		add esi, type dword
+	.endw
+	assume edi: nothing
 .code
 	ret
 middleGlue endp

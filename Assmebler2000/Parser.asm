@@ -221,6 +221,7 @@ importLine proc uses edi ebx
 		mov eax, currentExtern
 		mov [eax], edi ; record dll node address
 		add currentExtern, type dword
+		invoke crt_strcpy, addr [edi].nodeStr, addr [esi].tokenStr
 	.elseif [edi].nodeType == TRIE_DLL
 		; do nothing
 	.else
@@ -249,19 +250,22 @@ importLine proc uses edi ebx
 		.endif
 		.if parseCount == 1
 			invoke getOrCreateTrieItem, addr [esi].tokenStr
-			assume eax: ptr TrieNode
-			.if [eax].nodeType != TRIE_NULL
+			mov ebx, eax ; prevbug: use eax when using strcpy: wierd!
+			assume ebx: ptr TrieNode
+			.if [ebx].nodeType != TRIE_NULL
 				invoke crt_printf, addr cannotImportSymbol
 				mov lineErrorFlag, 1
 				inc totalErrorCount
 				ret
 			.endif
-			mov [eax].nodeType, TRIE_EXTERN
-			mov ebx, [edi].nodeVal
-			mov [eax].nodeVal, ebx
-			mov [edi].nodeVal, eax ; linked list
-			assume eax: nothing
+			mov [ebx].nodeType, TRIE_EXTERN
+			mov eax, [edi].nodeVal
+			mov [ebx].nodeVal, eax
+			mov [edi].nodeVal, ebx ; linked list
+			invoke crt_strcpy, addr (TrieNode ptr [ebx]).nodeStr, addr [esi].tokenStr ; prevbug: [edi].nodeStr, addr [esi]
+			assume ebx: nothing
 		.endif
+		add esi, type Token ; prevbug: forget this line
 	.endw
 
 	assume edi: nothing
@@ -269,25 +273,47 @@ importLine proc uses edi ebx
 	ret
 importLine endp
 
+; return non-zero if error
+setLabelLocation proc uses ebx, strAddr: ptr byte
+.data
+	labelAlreadyUsed byte "label already used: %s", 10, 0
+	mustBeInASection byte "label must be in a section", 10, 0
+.code
+	.if parseCount == 1
+		invoke getOrCreateTrieItem, strAddr
+		assume eax: ptr TrieNode
+		.if [eax].nodeType != TRIE_NULL
+			invoke crt_printf, addr labelAlreadyUsed, strAddr
+			mov eax, 1
+			ret
+		.endif
+		.if !currentSection
+			invoke crt_printf, addr mustBeInASection, strAddr
+			mov eax, 2
+			ret
+		.endif
+		mov [eax].nodeType, TRIE_LABEL
+		mov ebx, currentSection
+		mov ebx, (Section ptr [ebx]).locationCounter
+		mov [eax].nodeVal, ebx
+		invoke addTrieEntry, currentSection, eax ; prevbug: forget this line
+		assume eax: nothing
+	.endif
+	mov eax, 0
+	ret
+setLabelLocation endp
+
 parseLine proc uses esi
 	local lineNodeType: byte, lineNodeVal: dword, typeOkay: byte
 	mov esi, offset tokens
 	assume esi: ptr Token
 	.while [esi].tokenType == TOKEN_LABEL
-		invoke getOrCreateTrieItem, addr [esi].tokenStr
-		assume eax: ptr TrieNode
-		.if [eax].nodeType == TRIE_NULL
-			; set current location todo
-		.else
-.data
-	duplicateLabelDefinitionErr byte "duplicate label definition: %s", 10, 0
-.code
-			invoke crt_printf, addr duplicateLabelDefinitionErr, addr [esi].tokenStr
+		invoke setLabelLocation, addr [esi].tokenStr
+		.if eax
 			mov lineErrorFlag, 1
 			inc totalErrorCount
 			ret
 		.endif
-		assume eax: nothing
 		add esi, type Token
 	.endw
 	.if [esi].tokenType == TOKEN_ENDLINE ; empty statement
@@ -327,7 +353,7 @@ parseLine proc uses esi
 		.elseif lineNodeVal == DOTIMPORT
 			invoke importLine
 		.elseif lineNodeType == TRIE_INST
-			
+			; todo instruction
 		.else
 .data
 	impossibleInfo byte "impossible!", 10, 0

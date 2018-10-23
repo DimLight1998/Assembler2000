@@ -23,3 +23,4 @@ loadLine proto
 initSection proto, sectionAddr: dword, base: dword
 tmpLoadInput proto
 writeSectionData proto, sectionAddr: dword, data: dword, dataSize: dword
+addTrieEntry proto, sectionAddr: dword, trieEntry: dword

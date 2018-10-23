@@ -25,6 +25,7 @@ Token ends
 externdef tokenSize: dword, tokens: Token
 
 tokenizeLine proto
+assemble proto
 tmpTestSymbol proto
 tmpTestInteger proto
 tmpTestChar proto

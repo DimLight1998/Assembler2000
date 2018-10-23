@@ -53,3 +53,9 @@ INSINCL equ 28
 INSDECL equ 29
 INSNEGL equ 30
 INSLEAL equ 31
+
+addSymbol macro strName, TagName, value
+	invoke getOrCreateTrieItem, addr strName
+	mov [eax].nodeType, TagName
+	mov [eax].nodeVal, value
+endm

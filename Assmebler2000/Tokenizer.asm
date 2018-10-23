@@ -257,6 +257,7 @@ readString proc uses edx edi, tokenAddr: ptr Token
 	.while 1
 		movsx eax, [esi]
 		.if eax == 34 ; ", end of string
+			inc esi ; prevbug: forget this line
 			.break
 		.else
 			invoke readChar
@@ -273,7 +274,7 @@ readString proc uses edx edi, tokenAddr: ptr Token
 			inc edi
 		.endif
 	.endw	
-	mov edi, 0 ; end of string
+	mov [edi], 0 ; end of string prevbug: mov edi, 0
 	mov eax, 0 ; success
 	assume edi: nothing
 	assume edx: nothing
