@@ -118,6 +118,7 @@ readOperand proc uses edi, operAddr: ptr Operand
 			.elseif [esi].tokenType == TOKEN_MEM_COMMA
 				add esi, type Token
 			.else
+				invoke crt_printf, addr readBaseRegErr
 				mov eax, 6
 				ret
 			.endif

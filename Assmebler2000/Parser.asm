@@ -364,7 +364,7 @@ encodeInstruction proc instruction: dword
 				inc totalErrorCount
 				ret
 			.endif
-			invoke printOperand, curOp ; fixme
+			; invoke printOperand, curOp
 			add curOp, type Operand
 			inc opCount
 			.if [esi].tokenType == TOKEN_ENDLINE
@@ -382,6 +382,7 @@ encodeInstruction proc instruction: dword
 			.endif
 		.endw
 	.endif
+	; todo real instructions
 	assume esi: nothing
 	ret
 encodeInstruction endp
