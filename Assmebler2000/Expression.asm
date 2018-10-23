@@ -22,7 +22,7 @@ readExpression proc uses ebx edi, outputAddr: ptr dword ; prevbug: add esi to US
 				ret
 			.endif
 			mov bl, (TrieNode ptr [eax]).nodeType
-			.if bl != TRIE_VAR && bl != TRIE_LABEL
+			.if bl != TRIE_VAR && bl != TRIE_LABEL && bl != TRIE_EXTERN ; prevbug: forget TRIE_EXTERN
 .data
 	invalidSymbolTypeErr byte "invalid symbol type: %s", 10, 0
 .code
