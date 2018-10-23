@@ -1,0 +1,16 @@
+{
+    "New encoding function": {
+        "prefix": "encode",
+        "body": [
+            "$1 proc uses eax ebx ecx edx esi edi,",
+            "    memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword,",
+            "    immediateValue: dword, sourceReg: dword, destinationReg: dword,",
+            "    writeTo: ptr byte, sizeOut: ptr byte",
+            "",
+            "    $0",
+            "    ret",
+            "$1 endp"
+        ],
+        "description": "New encoding function"
+    }
+}
