@@ -7,6 +7,7 @@ include LineControl.inc
 .code
 
 ; return non-zero if error occures
+; eat the tokens if readed
 readExpression proc uses ebx edi, outputAddr: ptr dword ; prevbug: add esi to USES list
 	assume esi: ptr Token
 	mov edi, outputAddr

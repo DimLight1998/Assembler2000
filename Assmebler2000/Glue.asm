@@ -4,6 +4,20 @@ include LineControl.inc
 include SymbolDict.inc
 .code
 
+addBaseAddr proc sectionAddr: ptr Section, baseAddress: dword
+	mov ecx, sectionAddr
+	assume ecx: ptr Section
+	lea esi, [ecx].labelTries
+	mov eax, baseAddress
+	.while esi != [ecx].currentTrie
+		mov ebx, [esi]
+		add (TrieNode ptr [ebx]).nodeVal, eax
+		add esi, type dword
+	.endw
+	assume ecx: nothing
+	ret
+addBaseAddr endp
+
 middleGlue proc uses esi edi ebx
 .data
 	sectionLengthPrompt byte "this section's length is %d byte(s)", 10, 0
@@ -16,10 +30,10 @@ middleGlue proc uses esi edi ebx
 	getSectionLength dataSection
 	invoke crt_printf, addr sectionLengthPrompt, eax ; demo
 	; todo set section's base address
+	invoke addBaseAddr, addr textSection, 0 ; demo prevbug: use initSection and clear all labelTries info
+	invoke addBaseAddr, addr dataSection, 0 ; demo
 	invoke initSection, addr textSection, 0 ; demo
 	invoke initSection, addr dataSection, 0 ; demo
-	addBaseAddr textSection
-	addBaseAddr dataSection
 	; todo set external's address
 	mov esi, offset externTries
 	assume edi: ptr TrieNode

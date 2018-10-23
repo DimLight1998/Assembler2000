@@ -40,12 +40,11 @@ FileNameLength equ 1000
 ; load a line in lineBuffer
 ; return val in eax
 ; return bytes read, -1 if EOF
-loadLine proc
+loadLine proc uses ecx
 	invoke crt_fgets, addr lineBuffer, lengthof lineBuffer - 1, fin
 	; todo: line too long warning
 	.if eax != 0
 		invoke crt_strlen, addr lineBuffer ; store line length in eax return value
-		mov lineLength, eax
 
 		mov ecx, offset lineBuffer
 		add ecx, eax
@@ -56,6 +55,7 @@ loadLine proc
 			mov byte ptr [ecx], 0
 		.endif
 
+		mov lineLength, eax
 		mov lineEnd, ecx
 
 		inc lineNumber
@@ -68,21 +68,17 @@ loadLine endp
 writeSectionData proc uses esi edi eax, sectionAddr: dword, data: dword, dataSize: dword
 	mov esi, sectionAddr
 	assume esi: ptr Section
+	mov eax, data
+	mov edi, [esi].currentCursor
 	.if dataSize == 1
-		mov eax, data
-		mov edi, [esi].currentCursor
 		mov [edi], al
 		add [esi].currentCursor, 1
 		add [esi].locationCounter, 1
 	.elseif dataSize == 2
-		mov eax, data
-		mov edi, [esi].currentCursor
 		mov [edi], ax
 		add [esi].currentCursor, 2
 		add [esi].locationCounter, 2
 	.elseif dataSize == 4
-		mov eax, data
-		mov edi, [esi].currentCursor
 		mov [edi], eax
 		add [esi].currentCursor, 4
 		add [esi].locationCounter, 4
@@ -110,11 +106,12 @@ initSection proc uses eax esi, sectionAddr: dword, base: dword
 	ret
 initSection endp
 
-addTrieEntry proc uses esi, sectionAddr: dword, trieEntry: dword
+addTrieEntry proc uses esi eax ebx, sectionAddr: dword, trieEntry: dword
 	mov esi, sectionAddr
 	assume esi: ptr Section
 	mov eax, trieEntry
-	mov [esi].currentTrie, eax
+	mov ebx, [esi].currentTrie
+	mov [ebx], eax ; prevbug: memory reference bug
 	add [esi].currentTrie, type dword
 	assume esi: nothing
 	ret
