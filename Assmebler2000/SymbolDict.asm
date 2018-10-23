@@ -14,7 +14,7 @@ include SymbolDict.inc
 	dot_asciz byte ".asciz", 0
 	dot_set byte ".set", 0
 	dot_equ byte ".equ", 0
-	dot_align byte ".align", 0
+	; dot_align byte ".align", 0
 	dot_import byte ".import", 0
 	ins_addl byte "addl", 0
 	ins_subl byte "subl", 0

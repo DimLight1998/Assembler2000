@@ -22,13 +22,13 @@ middleGlue proc uses esi ebx
 .data
 	externalFromPrompt byte "I am %s from %s", 10, 0
 .code
-	mov esi, offset externTries
-	assume esi: ptr TrieNode
-	.while esi != currentExtern
-		invoke crt_printf, addr externalFromPrompt, addr [esi].nodeName, addr [esi].nodeStr
-		mov [esi].nodeVal, 0 ; demo, you should fill this with its address
-		add esi, type dword
-	.endw
+	;mov esi, offset externTries
+	;assume esi: ptr TrieNode
+	;.while esi != currentExtern
+	;	invoke crt_printf, addr externalFromPrompt, addr [esi].nodeName, addr [esi].nodeStr
+	;	mov [esi].nodeVal, 0 ; demo, you should fill this with its address
+	;	add esi, type dword
+	;.endw
 	assume esi: nothing
 .code
 	ret

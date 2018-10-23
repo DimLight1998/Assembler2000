@@ -6,7 +6,6 @@ TrieNode struct
 	nodeChildren dword 128 dup(?)
 	nodeVal dword ?
 	nodeStr byte 20 dup(?)
-	nodeName byte 20 dup(?)
 TrieNode ends
 
 TRIE_NULL equ 0
@@ -16,6 +15,7 @@ TRIE_DIRECTIVE equ 3
 TRIE_INST equ 4
 TRIE_REG equ 5
 TRIE_EXTERN equ 6
+TRIE_DLL equ 7
 
 dictPreprocess proto
 getTrieItem proto, strAddr: dword
@@ -31,7 +31,7 @@ DOTASCII equ 6
 DOTASCIZ equ 7
 DOTSET equ 8
 DOTEQU equ 9
-DOTALIGN equ 10
+; DOTALIGN equ 10 wontfix
 DOTIMPORT equ 11
 INSADDL equ 12
 INSSUBL equ 13

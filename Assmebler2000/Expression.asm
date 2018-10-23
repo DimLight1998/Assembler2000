@@ -6,6 +6,7 @@ include LineControl.inc
 
 .code
 
+; return non-zero if error occures
 readExpression proc uses esi ebx, outputAddr: ptr dword ; todo need test
 	assume esi: ptr Token
 	.if [esi].tokenType == TOKEN_SYMBOL || [esi].tokenType == TOKEN_LABEL

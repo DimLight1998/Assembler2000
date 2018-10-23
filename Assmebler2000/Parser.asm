@@ -121,6 +121,7 @@ allocateString proc uses edi, nodeVal: dword
 	ret
 allocateString endp
 
+; return non-zero if error occures
 addDefine proc uses ebx, strAddr: dword, value: dword
 	.if parseCount == 2
 		invoke getOrCreateTrieItem, strAddr
@@ -145,6 +146,128 @@ addDefine proc uses ebx, strAddr: dword, value: dword
 	mov eax, 0
 	ret
 addDefine endp
+
+setLineDefine proc
+	local strAddr: ptr byte, value: dword
+	assume esi: ptr Token
+	.if [esi].tokenType != TOKEN_SYMBOL
+.data
+	assigneeNotSymbolErr byte "assignee not a symbol", 10, 0
+.code
+		invoke crt_printf, addr assigneeNotSymbolErr
+		mov lineErrorFlag, 1
+		inc totalErrorCount
+		ret
+	.endif
+	lea eax, [esi].tokenStr
+	mov strAddr, eax
+	add esi, type Token
+	.if [esi].tokenType != TOKEN_COMMA
+.data
+	syntaxErrReadDefine byte "syntax error when assign define", 10, 0
+.code
+		invoke crt_printf, addr syntaxErrReadDefine
+		mov lineErrorFlag, 1
+		inc totalErrorCount
+		ret
+	.endif
+	add esi, type Token
+
+	invoke readExpression, addr value
+	.if eax ; error
+		mov lineErrorFlag, 1
+		inc totalErrorCount
+		ret
+	.endif
+	
+	.if [esi].tokenType != TOKEN_ENDLINE
+		invoke crt_printf, addr syntaxErrReadDefine
+		mov lineErrorFlag, 1
+		inc totalErrorCount
+		ret
+	.endif
+
+	invoke addDefine, strAddr, value
+	.if eax
+		mov lineErrorFlag, 1
+		inc totalErrorCount
+		ret
+	.endif
+
+	assume esi: nothing
+	ret
+setLineDefine endp
+
+importLine proc uses edi ebx
+	assume esi: ptr Token
+.data
+	syntaxImportLineErr byte "syntax error when paring .import", 10, 0
+	expectedImportSymbol byte "expect symbol to import", 10, 0
+	dllNameAlreadyUsed byte "dll name already used: %s", 10, 0
+	cannotImportSymbol byte "duplicate import of symbol %s", 10, 0
+.code
+	.if [esi].tokenType != TOKEN_STRING
+		invoke crt_printf, addr syntaxImportLineErr
+		mov lineErrorFlag, 1
+		inc totalErrorCount
+		ret
+	.endif
+	invoke getOrCreateTrieItem, addr [esi].tokenStr
+	mov edi, eax
+	assume edi: ptr TrieNode
+	.if [edi].nodeType == TRIE_NULL
+		mov [edi].nodeType, TRIE_DLL
+		mov [edi].nodeVal, 0
+		mov eax, currentExtern
+		mov [eax], edi ; record dll node address
+		add currentExtern, type dword
+	.elseif [edi].nodeType == TRIE_DLL
+		; do nothing
+	.else
+		invoke crt_printf, addr dllNameAlreadyUsed, addr [esi].tokenStr
+		mov lineErrorFlag, 1
+		inc totalErrorCount
+		ret
+	.endif
+	add esi, type Token
+	.while 1
+		.if [esi].tokenType == TOKEN_COMMA
+			add esi, type Token
+		.elseif [esi].tokenType == TOKEN_ENDLINE
+			.break
+		.else
+			invoke crt_printf, addr syntaxImportLineErr
+			mov lineErrorFlag, 1
+			inc totalErrorCount
+			ret
+		.endif
+		.if [esi].tokenType != TOKEN_SYMBOL
+			invoke crt_printf, addr expectedImportSymbol
+			mov lineErrorFlag, 1
+			inc totalErrorCount
+			ret
+		.endif
+		.if parseCount == 1
+			invoke getOrCreateTrieItem, addr [esi].tokenStr
+			assume eax: ptr TrieNode
+			.if [eax].nodeType != TRIE_NULL
+				invoke crt_printf, addr cannotImportSymbol
+				mov lineErrorFlag, 1
+				inc totalErrorCount
+				ret
+			.endif
+			mov [eax].nodeType, TRIE_EXTERN
+			mov ebx, [edi].nodeVal
+			mov [eax].nodeVal, ebx
+			mov [edi].nodeVal, eax ; linked list
+			assume eax: nothing
+		.endif
+	.endw
+
+	assume edi: nothing
+	assume esi: nothing
+	ret
+importLine endp
 
 parseLine proc uses esi
 	local lineNodeType: byte, lineNodeVal: dword, typeOkay: byte
@@ -200,11 +323,9 @@ parseLine proc uses esi
 		.elseif lineNodeVal == DOTASCII || lineNodeVal == DOTASCIZ
 			invoke allocateString, lineNodeVal
 		.elseif lineNodeVal == DOTSET || lineNodeVal == DOTEQU
-
-		.elseif lineNodeVal == DOTALIGN
-
+			invoke setLineDefine
 		.elseif lineNodeVal == DOTIMPORT
-
+			invoke importLine
 		.elseif lineNodeType == TRIE_INST
 			
 		.else
