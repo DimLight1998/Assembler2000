@@ -253,7 +253,7 @@ importLine proc uses edi ebx
 			mov ebx, eax ; prevbug: use eax when using strcpy: wierd!
 			assume ebx: ptr TrieNode
 			.if [ebx].nodeType != TRIE_NULL
-				invoke crt_printf, addr cannotImportSymbol
+				invoke crt_printf, addr cannotImportSymbol, addr [esi].tokenStr
 				mov lineErrorFlag, 1
 				inc totalErrorCount
 				ret
@@ -262,7 +262,7 @@ importLine proc uses edi ebx
 			mov eax, [edi].nodeVal
 			mov [ebx].nodeVal, eax
 			mov [edi].nodeVal, ebx ; linked list
-			invoke crt_strcpy, addr (TrieNode ptr [ebx]).nodeStr, addr [esi].tokenStr ; prevbug: [edi].nodeStr, addr [esi]
+			invoke crt_strcpy, addr [ebx].nodeStr, addr [esi].tokenStr ; prevbug: [edi].nodeStr, addr [esi]
 			assume ebx: nothing
 		.endif
 		add esi, type Token ; prevbug: forget this line
