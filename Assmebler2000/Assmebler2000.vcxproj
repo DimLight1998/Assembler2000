@@ -155,11 +155,17 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <MASM Include="Operands.asm" />
     <MASM Include="Parser.asm" />
     <MASM Include="SymbolDict.asm" />
     <MASM Include="Tokenizer.asm">
       <FileType>Document</FileType>
     </MASM>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Operands.inc">
+      <FileType>Document</FileType>
+    </ClInclude>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

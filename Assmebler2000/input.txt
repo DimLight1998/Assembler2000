@@ -6,7 +6,9 @@ _2333a:hahaha:.long 2147483647,2333333,65536
 .ascii "Fuck","nbide"
 .asciz "oh that's good\"!\'"
 .text
-.import "kernel32.dll",ExitProcess,GetCommandLine
+.import "kernel32.dll",ExitProcess
+.import "kernel32.dll",GetCommandLine
 .set oh, 233
 .equ that, oh
+movl .b,1,%eax,$.b,123(%ebx),123(%ebx,%esi),123(%ebx,%esi,2),123(,%esi),123(,%esi,2)
 

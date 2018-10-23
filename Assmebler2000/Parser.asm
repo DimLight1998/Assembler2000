@@ -4,6 +4,7 @@ include Tokenizer.inc
 include LineControl.inc
 include SymbolDict.inc
 include Expression.inc
+include Operands.inc
 
 .code
 
@@ -331,6 +332,60 @@ assignLine proc
 	ret
 assignLine endp
 
+printOperand proc uses edi, operAddr: ptr Operand
+.data
+	regPattern byte "reg %d", 10, 0
+	immPattern byte "imm %d", 10, 0
+	memPattern byte "mem %d(%d,%d,%d)", 10, 0
+.code
+	mov edi, operAddr
+	assume edi: ptr Operand
+	.if [edi].operandType == OPER_REG
+		invoke crt_printf, addr regPattern, [edi].baseReg
+	.elseif [edi].operandType == OPER_IMM
+		invoke crt_printf, addr immPattern, [edi].displacement
+	.elseif [edi].operandType == OPER_MEM
+		invoke crt_printf, addr memPattern, [edi].displacement, [edi].baseReg, [edi].indexReg, [edi].scale
+	.endif
+	assume edi: nothing
+	ret
+printOperand endp
+
+encodeInstruction proc instruction: dword
+	local opCount: dword
+	mov opCount, 0
+	assume esi: ptr Token
+	mov curOp, offset operands
+	.if [esi].tokenType != TOKEN_ENDLINE
+		.while 1
+			invoke readOperand, curOp
+			.if eax
+				mov lineErrorFlag, 1
+				inc totalErrorCount
+				ret
+			.endif
+			invoke printOperand, curOp ; fixme
+			add curOp, type Operand
+			inc opCount
+			.if [esi].tokenType == TOKEN_ENDLINE
+				.break
+			.elseif [esi].tokenType == TOKEN_COMMA
+				add esi, type Token
+			.else
+.data
+	syntaxErrorOperand byte "syntax error when reading operands", 10, 0
+.code
+				invoke crt_printf, addr syntaxErrorOperand
+				mov lineErrorFlag, 1
+				inc totalErrorCount
+				ret
+			.endif
+		.endw
+	.endif
+	assume esi: nothing
+	ret
+encodeInstruction endp
+
 parseLine proc uses esi ebx
 	local lineNodeType: byte, lineNodeVal: dword, typeOkay: byte
 	mov esi, offset tokens
@@ -394,7 +449,7 @@ parseLine proc uses esi ebx
 		.elseif lineNodeVal == DOTIMPORT
 			invoke importLine
 		.elseif lineNodeType == TRIE_INST
-			; todo instruction
+			invoke encodeInstruction, lineNodeVal
 		.else
 .data
 	impossibleInfo byte "impossible!", 10, 0

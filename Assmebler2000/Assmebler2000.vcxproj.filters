@@ -36,27 +36,35 @@
     <MASM Include="Glue.asm">
       <Filter>源文件</Filter>
     </MASM>
+    <MASM Include="Operands.asm">
+      <Filter>源文件</Filter>
+    </MASM>
   </ItemGroup>
   <ItemGroup>
-    <None Include="common.inc">
+    <ClInclude Include="common.inc">
       <Filter>头文件</Filter>
-    </None>
-    <None Include="LineControl.inc">
+    </ClInclude>
+    <ClInclude Include="Expression.inc">
       <Filter>头文件</Filter>
-    </None>
-    <None Include="Tokenizer.inc">
+    </ClInclude>
+    <ClInclude Include="Glue.inc">
       <Filter>头文件</Filter>
-    </None>
-    <None Include="SymbolDict.inc">
+    </ClInclude>
+    <ClInclude Include="LineControl.inc">
       <Filter>头文件</Filter>
-    </None>
-    <None Include="Parser.inc">
+    </ClInclude>
+    <ClInclude Include="Parser.inc">
       <Filter>头文件</Filter>
-    </None>
-    <None Include="Expression.inc">
+    </ClInclude>
+    <ClInclude Include="SymbolDict.inc">
       <Filter>头文件</Filter>
-    </None>
-    <None Include="Glue.inc">
+    </ClInclude>
+    <ClInclude Include="Tokenizer.inc">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Operands.inc">
       <Filter>头文件</Filter>
     </None>
   </ItemGroup>
