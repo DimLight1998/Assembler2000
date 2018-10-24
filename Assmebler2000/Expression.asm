@@ -459,12 +459,14 @@ readExpression proc uses edi edx, outputAddr: ptr dword
 	mov edi, outputAddr
 	mov dword ptr [edi], eax
 
-	.if parseCount == 2 ; fixme
+comment ! ; for debug
+	.if parseCount == 2
 .data
 	tmpPat byte "%d", 10, 0
 .code
 		invoke crt_printf, addr tmpPat, eax
 	.endif
+!
 
 	mov eax, 0
 	assume esi: nothing
