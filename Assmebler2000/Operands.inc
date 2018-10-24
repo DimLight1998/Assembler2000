@@ -1,4 +1,4 @@
-MaxOperandCount equ 1000
+MaxOperandCount equ 5000
 
 OPER_REG equ 1
 OPER_IMM equ 2

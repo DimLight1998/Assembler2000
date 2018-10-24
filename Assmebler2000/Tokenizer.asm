@@ -3,8 +3,6 @@ include Tokenizer.inc
 include LineControl.inc
 include SymbolDict.inc
 
-MaxToken equ 1000
-
 .data?
 	tokenSize dword ?
 	tokens Token MaxToken dup(<>)

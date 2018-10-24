@@ -26,9 +26,9 @@ middleGlue proc uses esi edi ebx
 .code
 	; get length
 	getSectionLength textSection
-	invoke crt_printf, addr sectionLengthPrompt, eax ; demo
+	;invoke crt_printf, addr sectionLengthPrompt, eax ; demo fixme
 	getSectionLength dataSection
-	invoke crt_printf, addr sectionLengthPrompt, eax ; demo
+	;invoke crt_printf, addr sectionLengthPrompt, eax ; demo fixme
 	; todo set section's base address
 	invoke addBaseAddr, addr textSection, 0 ; demo prevbug: use initSection and clear all labelTries info
 	invoke addBaseAddr, addr dataSection, 0 ; demo

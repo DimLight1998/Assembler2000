@@ -1,6 +1,8 @@
 TokenStringLength equ 200
 ; todo token too long warning
 
+MaxToken equ 1000
+
 TOKEN_SYMBOL equ 1
 TOKEN_LABEL equ 2
 TOKEN_INTEGER equ 3

@@ -1,8 +1,10 @@
 externdef lineBuffer: byte, lineLength: dword, lineEnd: dword
 externdef lineErrorFlag: byte, totalErrorCount: dword
 
-MaxLabelInSection equ 2000
+MaxLabelInSection equ 20000
 MaxByteInSection equ 200000
+MaxBufferLength equ 100000
+FileNameLength equ 1000
 SEEK_SET equ 0 ; for fseek
 
 Section struct

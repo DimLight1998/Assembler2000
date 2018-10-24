@@ -114,7 +114,11 @@ pushNumber endp
 
 ; return -1 if error
 popNumber proc uses edi, outputAddr: ptr dword
+.data
+	numStackEmptyErr byte "num stack empty error", 10, 0
+.code
 	.if numTop == offset numStack ; empty stack
+		invoke crt_printf, addr numStackEmptyErr
 		mov eax, -1
 		ret
 	.endif
@@ -134,8 +138,10 @@ popOperator proc
 .data
 	invalidOperator byte "invalid operator", 10, 0
 	divideZero byte "integer divided by zero error", 10, 0
+	operatorStackEmpty byte "operator stack empty error", 10, 0
 .code
 	.if opTop == offset opStack
+		invoke crt_printf, addr operatorStackEmpty
 		mov eax, -1
 		ret
 	.endif
@@ -293,18 +299,20 @@ popOperator endp
 pushOperator proc uses edi ebx, oppo: byte, priority: dword
 	assume edi: ptr Operator
 	mov ebx, priority
-	.while opTop > offset opStack
-		mov edi, opTop
-		sub edi, type Operator ; prevbug: ftl
-		.if [edi].priority >= ebx
-			invoke popOperator
-			.if eax == -1
-				ret
+	.if priority != 5 ; prevbug: note that unary operator is right-combined, should not pop previous unary operator
+		.while opTop > offset opStack
+			mov edi, opTop
+			sub edi, type Operator ; prevbug: ftl
+			.if [edi].priority >= ebx
+				invoke popOperator
+				.if eax == -1
+					ret
+				.endif
+			.else
+				.break
 			.endif
-		.else
-			.break
-		.endif
-	.endw
+		.endw
+	.endif
 	mov edi, opTop
 	mov al, oppo
 	mov [edi].operatorType, al
@@ -366,6 +374,9 @@ readExpression proc uses edi edx, outputAddr: ptr dword
 				.endif
 				invoke getOpPriority, [esi].tokenType ; prevbug: ftl, use binary operator's priority when change to unary
 				invoke pushOperator, [esi].tokenType, eax ; prevbug: forget this line
+				.if eax == -1 ; prevbug: forget to throw the error
+					ret
+				.endif
 			.else
 				.if eax == 5 ; wrong unary operator use
 					invoke crt_printf, addr cannotUseUnaryHere
@@ -373,6 +384,9 @@ readExpression proc uses edi edx, outputAddr: ptr dword
 					ret
 				.endif
 				invoke pushOperator, [esi].tokenType, eax
+				.if eax == -1
+					ret
+				.endif
 			.endif
 
 			mov prevNumFlag, 0
@@ -409,6 +423,9 @@ readExpression proc uses edi edx, outputAddr: ptr dword
 				.if dl == TOKEN_LEFTBRA
 					sub opTop, type Operator
 					invoke popNumber, addr output
+					.if eax == -1
+						ret
+					.endif
 					invoke pushNumber, output
 					.break
 				.else
@@ -433,6 +450,7 @@ readExpression proc uses edi edx, outputAddr: ptr dword
 	.endw
 
 	.if numTop != offset numStack + type dword
+		invoke crt_printf, addr syntaxError
 		mov eax, 5
 		ret
 	.endif
@@ -440,6 +458,13 @@ readExpression proc uses edi edx, outputAddr: ptr dword
 	mov eax, numStack
 	mov edi, outputAddr
 	mov dword ptr [edi], eax
+
+	.if parseCount == 2 ; fixme
+.data
+	tmpPat byte "%d", 10, 0
+.code
+		invoke crt_printf, addr tmpPat, eax
+	.endif
 
 	mov eax, 0
 	assume esi: nothing

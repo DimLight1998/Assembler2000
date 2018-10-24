@@ -1,4 +1,4 @@
-MaxStackCount equ 1000
+MaxStackCount equ 5000
 
 Operator struct
 	operatorType byte ?

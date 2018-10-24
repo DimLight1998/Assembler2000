@@ -5,9 +5,6 @@ include Tokenizer.inc
 include Parser.inc
 include SymbolDict.inc
 
-MaxBufferLength equ 100000
-FileNameLength equ 1000
-
 .data
 	inMode byte "r", 0
 	outMode byte "w", 0

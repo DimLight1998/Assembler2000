@@ -1,11 +1,11 @@
-MaxTrieNodeCount equ 1000
+MaxTrieNodeCount equ 2000
 ; todo trie node too many warning
 
 TrieNode struct
 	nodeType byte ?
 	nodeChildren dword 128 dup(?)
 	nodeVal dword ?
-	nodeStr byte 20 dup(?)
+	nodeStr byte 30 dup(?)
 TrieNode ends
 
 TRIE_NULL equ 0
