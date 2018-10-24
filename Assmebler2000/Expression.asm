@@ -31,6 +31,16 @@ readExpression proc uses ebx edi, outputAddr: ptr dword ; prevbug: add esi to US
 				mov eax, 2
 				ret
 			.endif
+			.if eax == dotTrieAddr ; special dot symbol
+				.if !currentSection			
+.data
+	mustBeInSegmentBlock byte "special dot symbol must be in segment block", 10, 0
+.code
+					invoke crt_printf, addr mustBeInSegmentBlock
+					mov eax, 4
+					ret
+				.endif
+			.endif
 			mov eax, (TrieNode ptr [eax]).nodeVal
 			mov [edi], eax
 		.else ; first pass

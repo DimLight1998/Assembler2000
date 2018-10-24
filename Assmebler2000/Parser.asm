@@ -11,8 +11,12 @@ include Operands.inc
 switchSegment proc, nodeVal: dword
 	.if nodeVal == DOTDATA
 		mov currentSection, offset dataSection
+		mov eax, dataSection.locationCounter
+		mov (TrieNode ptr dotTrieAddr).nodeVal, eax
 	.elseif nodeVal == DOTTEXT
 		mov currentSection, offset textSection
+		mov eax, textSection.locationCounter
+		mov (TrieNode ptr dotTrieAddr).nodeVal, eax
 	.endif
 	mov al, (Token ptr [esi]).tokenType
 	.if al != TOKEN_ENDLINE
@@ -124,6 +128,9 @@ allocateString endp
 
 ; return non-zero if error occures
 addDefine proc uses ebx, strAddr: dword, value: dword
+.data
+	mustBeInSegmentBlock byte "special dot symbol must be in segment block", 10, 0
+.code
 	.if parseCount == 2
 		invoke getOrCreateTrieItem, strAddr
 		assume eax: ptr TrieNode
@@ -132,8 +139,19 @@ addDefine proc uses ebx, strAddr: dword, value: dword
 			mov ebx, value
 			mov [eax].nodeVal, ebx
 		.elseif [eax].nodeType == TRIE_VAR
-			mov ebx, value
-			mov [eax].nodeVal, ebx
+			.if eax == dotTrieAddr ; special dot symbol
+				.if !currentSection
+					invoke crt_printf, addr mustBeInSegmentBlock
+					mov eax, 2
+					ret
+				.endif
+				mov ebx, value
+				sub ebx, [eax].nodeVal ; calculate the difference
+				invoke addSectionLocation, currentSection, ebx
+			.else
+				mov ebx, value
+				mov [eax].nodeVal, ebx
+			.endif
 		.else
 .data
 	cannotAssignDefineErr byte "cannot assign define to %s", 10, 0
@@ -351,8 +369,16 @@ printOperand proc uses edi, operAddr: ptr Operand
 	ret
 printOperand endp
 
-encodeInstruction proc instruction: dword
+encodeInstruction proc uses edi ebx, instruction: dword, strAddr: ptr byte
 	local opCount: dword
+.data
+	invalidInstruction byte "no matching instruction %s ",0
+	regPat byte "reg32", 0
+	immPat byte "imm32", 0
+	memPat byte "mem32", 0
+	commaPat byte ", ", 0
+	newLinePat byte 10, 0
+.code
 	mov opCount, 0
 	assume esi: ptr Token
 	mov curOp, offset operands
@@ -382,7 +408,40 @@ encodeInstruction proc instruction: dword
 			.endif
 		.endw
 	.endif
-	; todo real instructions
+	mov edi, offset operands
+	assume edi: ptr Operand
+	.if instruction == INSADDL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_MEM
+		; AddMemReg
+	.elseif instruction == INSADDL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_REG
+		; AddRegReg
+	.elseif instruction == INSADDL && opCount == 2 && [edi].operandType == OPER_MEM && [edi + type Operand].operandType == OPER_REG
+		; AddRegMem todo
+	.else
+		invoke crt_printf, addr invalidInstruction, strAddr
+		mov edi, offset operands
+		mov ebx, opCount
+		.while ebx > 0
+			.if [edi].operandType == OPER_REG
+				invoke crt_printf, addr regPat
+			.elseif [edi].operandType == OPER_IMM
+				invoke crt_printf, addr immPat
+			.elseif [edi].operandType == OPER_MEM
+				invoke crt_printf, addr memPat
+			.endif
+			add edi, type Operand
+			.if ebx > 1
+				invoke crt_printf, addr commaPat
+			.else
+				invoke crt_printf, addr newLinePat
+			.endif
+			dec ebx
+		.endw
+		
+		mov lineErrorFlag, 1
+		inc totalErrorCount
+		ret
+	.endif
+	assume edi: nothing
 	assume esi: nothing
 	ret
 encodeInstruction endp
@@ -450,7 +509,7 @@ parseLine proc uses esi ebx
 		.elseif lineNodeVal == DOTIMPORT
 			invoke importLine
 		.elseif lineNodeType == TRIE_INST
-			invoke encodeInstruction, lineNodeVal
+			invoke encodeInstruction, lineNodeVal, addr [esi - type Token].tokenStr
 		.else
 .data
 	impossibleInfo byte "impossible!", 10, 0

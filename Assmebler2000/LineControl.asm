@@ -65,6 +65,17 @@ loadLine proc uses ecx
 	ret
 loadLine endp
 
+addSectionLocation proc uses esi edi, sectionAddr: dword, difference: dword
+	mov esi, sectionAddr
+	assume esi: ptr Section
+	mov edi, difference
+	add [esi].currentCursor, edi
+	add [esi].locationCounter, edi
+	add (TrieNode ptr dotTrieAddr).nodeVal, edi
+	assume esi: nothing
+	ret
+addSectionLocation endp
+
 writeSectionData proc uses esi edi eax, sectionAddr: dword, data: dword, dataSize: dword
 	mov esi, sectionAddr
 	assume esi: ptr Section
@@ -72,16 +83,13 @@ writeSectionData proc uses esi edi eax, sectionAddr: dword, data: dword, dataSiz
 	mov edi, [esi].currentCursor
 	.if dataSize == 1
 		mov [edi], al
-		add [esi].currentCursor, 1
-		add [esi].locationCounter, 1
+		invoke addSectionLocation, sectionAddr, 1
 	.elseif dataSize == 2
 		mov [edi], ax
-		add [esi].currentCursor, 2
-		add [esi].locationCounter, 2
+		invoke addSectionLocation, sectionAddr, 2
 	.elseif dataSize == 4
 		mov [edi], eax
-		add [esi].currentCursor, 4
-		add [esi].locationCounter, 4
+		invoke addSectionLocation, sectionAddr, 4
 	.else
 .data
 	unsupportedDataSize byte "unsupported data size: %d", 10, 0

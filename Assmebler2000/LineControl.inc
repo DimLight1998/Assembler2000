@@ -19,6 +19,8 @@ externdef currentSection: dword
 externdef parseCount: dword
 externdef externTries: dword, currentExtern: dword
 
+
+addSectionLocation proto, sectionAddr: dword, difference: dword
 assemble proto
 loadLine proto
 initSection proto, sectionAddr: dword, base: dword

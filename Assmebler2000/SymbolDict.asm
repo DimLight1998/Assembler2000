@@ -4,6 +4,7 @@ include SymbolDict.inc
 .data?
 	trieNodes TrieNode MaxTrieNodeCount dup(<>)
 	trieAllocator dword ?
+	dotTrieAddr dword ?
 .data
 	dot_data byte ".data", 0
 	dot_text byte ".text", 0
@@ -44,6 +45,7 @@ include SymbolDict.inc
 	reg_ebp byte "ebp", 0
 	reg_esi byte "esi", 0
 	reg_edi byte "edi", 0
+	dot_symbol byte ".", 0
 .code
 
 initNode proc uses eax edi ecx, nodeAddr: ptr TrieNode
@@ -104,6 +106,11 @@ dictPreprocess proc
 	addSymbol ins_decl , TRIE_INST, INSDECL 
 	addSymbol ins_negl , TRIE_INST, INSNEGL 
 	addSymbol ins_leal , TRIE_INST, INSLEAL 
+
+	; special dot symbol
+	addSymbol dot_symbol, TRIE_VAR, 0
+	invoke getOrCreateTrieItem, addr dot_symbol
+	mov dotTrieAddr, eax
 
 	assume eax: nothing
 	ret

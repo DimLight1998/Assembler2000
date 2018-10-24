@@ -21,6 +21,7 @@ dictPreprocess proto
 getTrieItem proto, strAddr: dword
 getOrCreateTrieItem proto, strAddr: dword
 isReg proto, strAddr: dword
+externdef dotTrieAddr: dword
 
 DOTDATA equ 1
 DOTTEXT equ 2
