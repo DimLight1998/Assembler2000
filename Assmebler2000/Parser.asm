@@ -390,7 +390,7 @@ encodeInstruction proc uses edi ebx, instruction: dword, strAddr: ptr byte
 				inc totalErrorCount
 				ret
 			.endif
-			; invoke printOperand, curOp
+			invoke printOperand, curOp ; fixme
 			add curOp, type Operand
 			inc opCount
 			.if [esi].tokenType == TOKEN_ENDLINE

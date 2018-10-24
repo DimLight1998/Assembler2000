@@ -5,6 +5,7 @@
 
 # Ignore Experimental sources
 Experimental/
+Assmebler2000/input.txt
 
 # User-specific files
 *.rsuser

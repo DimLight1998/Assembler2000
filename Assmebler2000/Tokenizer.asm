@@ -5,13 +5,30 @@ include SymbolDict.inc
 
 MaxToken equ 1000
 
-
 .data?
 	tokenSize dword ?
 	tokens Token MaxToken dup(<>)
 	bracketStack dword MaxToken dup(?)
 	bracketDepth dword ?
 .code
+
+; return -1 if not an operator
+getOpPriority proc, op: dword
+	.if op == TOKEN_UNARY_NEG || op == TOKEN_UNARY_NOT || op == TOKEN_UNARY_POS || op == TOKEN_UNARY_BIT_NOT
+		mov eax, 5
+	.elseif op == TOKEN_MUL || op == TOKEN_DIV || op == TOKEN_MOD || op == TOKEN_SHL || op == TOKEN_SHR
+		mov eax, 4
+	.elseif op == TOKEN_BIT_OR || op == TOKEN_BIT_AND || op == TOKEN_BIT_XOR || op == TOKEN_BIT_ORNOT
+		mov eax, 3
+	.elseif op == TOKEN_ADD || op == TOKEN_SUB || op == TOKEN_EQUAL || op == TOKEN_NOT_EQUAL || op == TOKEN_LESS || op == TOKEN_GREATER || op == TOKEN_GE || op == TOKEN_LE
+		mov eax, 2
+	.elseif	op == TOKEN_LOGIC_AND || op == TOKEN_LOGIC_OR
+		mov eax, 1
+	.else
+		mov eax, -1
+	.endif
+	ret
+getOpPriority endp
 
 ; Receive: esi current string idx
 ; does not modify esi
@@ -424,9 +441,103 @@ tokenizeLine proc uses esi edi ebx
 			inc esi
 			endAndContinue
 		.elseif eax == 61 ; =
-			mov [edi].tokenType, TOKEN_ASSIGN
+			.if byte ptr [esi + 1] == 61 ; ==
+				mov [edi].tokenType, TOKEN_EQUAL
+				add esi, 2
+				endAndContinue
+			.else
+				mov [edi].tokenType, TOKEN_ASSIGN
+				inc esi
+				endAndContinue
+			.endif
+		.elseif eax == 43 ; +
+			mov [edi].tokenType, TOKEN_ADD
 			inc esi
 			endAndContinue
+		.elseif eax == 45 ; -
+			mov [edi].tokenType, TOKEN_SUB
+			inc esi
+			endAndContinue
+		.elseif eax == 42 ; *
+			mov [edi].tokenType, TOKEN_MUL
+			inc esi
+			endAndContinue
+		.elseif eax == 94 ; ^
+			mov [edi].tokenType, TOKEN_BIT_XOR
+			inc esi
+			endAndContinue
+		.elseif eax == 33 ; !
+			.if byte ptr [esi + 1] == 61 ; !=
+				mov [edi].tokenType, TOKEN_NOT_EQUAL
+				add esi, 2
+				endAndContinue
+			.else
+				mov [edi].tokenType, TOKEN_BIT_ORNOT
+				inc esi
+				endAndContinue
+			.endif
+		.elseif eax == 38 ; &
+			.if byte ptr [esi + 1] == 38 ; &
+				mov [edi].tokenType, TOKEN_LOGIC_AND
+				add esi, 2
+				endAndContinue
+			.else
+				mov [edi].tokenType, TOKEN_BIT_AND
+				inc esi
+				endAndContinue
+			.endif
+		.elseif eax == 124 ; |
+			.if byte ptr [esi + 1] == 124 ; |
+				mov [edi].tokenType, TOKEN_LOGIC_OR
+				add esi, 2
+				endAndContinue
+			.else
+				mov [edi].tokenType, TOKEN_BIT_OR
+				inc esi
+				endAndContinue
+			.endif
+		.elseif eax == 126 ; ~
+			mov [edi].tokenType, TOKEN_UNARY_BIT_NOT
+			inc esi
+			endAndContinue
+		.elseif eax == 35 ; #
+			.break ; find comment, end line
+		.elseif eax == 47 ; /
+			.if byte ptr [esi + 1] == 47 ; //
+				.break ; find comment, end line
+			.else
+				mov [edi].tokenType, TOKEN_DIV
+				inc esi
+				endAndContinue
+			.endif
+		.elseif eax == 60 ; <
+			.if byte ptr [esi + 1] == 61 ; <=
+				mov [edi].tokenType, TOKEN_LE
+				add esi, 2
+				endAndContinue
+			.elseif byte ptr [esi + 1] == 60 ; <<
+				mov [edi].tokenType, TOKEN_SHL
+				add esi, 2
+				endAndContinue
+			.else
+				mov [edi].tokenType, TOKEN_LESS
+				inc esi
+				endAndContinue
+			.endif
+		.elseif eax == 62 ; >
+			.if byte ptr [esi + 1] == 61 ; >=
+				mov [edi].tokenType, TOKEN_GE
+				add esi, 2
+				endAndContinue
+			.elseif byte ptr [esi + 1] == 62 ; >>
+				mov [edi].tokenType, TOKEN_SHR
+				add esi, 2
+				endAndContinue
+			.else
+				mov [edi].tokenType, TOKEN_GREATER
+				inc esi
+				endAndContinue
+			.endif
 		.elseif eax == 40 ; (
 			mov [edi].tokenType, TOKEN_LEFTBRA
 			inc bracketDepth
