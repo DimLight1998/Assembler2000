@@ -46,11 +46,12 @@ NegMem proc uses eax ebx ecx edx esi edi,
 
     .if cl == 0
         mov edx, 2
-    .else if cl == 1
+    .elseif cl == 1
         mov [eax + 2], bl
         mov edx, 3
     .else
         invoke ExitProcess, 1
+    .endif
 
     mov ecx, memDisplacement
     mov dword ptr [eax + edx], ecx

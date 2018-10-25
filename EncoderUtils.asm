@@ -6,23 +6,24 @@ option casemap:none
 RegInMemRegRmValue proc, reg: dword
     .if reg == 0
         mov al, 0
-    .else if reg == 1
+    .elseif reg == 1
         mov al, 8
-    .else if reg == 2
+    .elseif reg == 2
         mov al, 16
-    .else if reg == 3
+    .elseif reg == 3
         mov al, 24
-    .else if reg == 4
+    .elseif reg == 4
         mov al, 32
-    .else if reg == 5
+    .elseif reg == 5
         mov al, 40
-    .else if reg == 6
+    .elseif reg == 6
         mov al, 48
-    .else if reg == 7
+    .elseif reg == 7
         mov al, 56
     .else
         ; reg should be in [0, 8)
         invoke ExitProcess, 1
+    .endif
 
     ret
 RegInMemRegRmValue endp
@@ -31,15 +32,16 @@ RegInMemRegRmValue endp
 ScaleInSibValue proc, scale: dword
     .if scale == 1
         mov al, 0
-    .else if scale == 2
+    .elseif scale == 2
         mov al, 64
-    .else if scale == 4
+    .elseif scale == 4
         mov al, 128
-    .else if scale == 8
+    .elseif scale == 8
         mov al, 192
     .else
         ; scale should be in {1, 2, 4, 8}
         invoke ExitProcess, 1
+    .endif
     ret
 ScaleInSibValue endp
 
@@ -49,24 +51,25 @@ ScaleInSibValue endp
 IndexInSibValue proc, index: dword
     .if index == 0
         mov al, 0
-    .else if index == 1
+    .elseif index == 1
         mov al, 8
-    .else if index == 2
+    .elseif index == 2
         mov al, 16
-    .else if index == 3
+    .elseif index == 3
         mov al, 24
-    .else if index == 4
+    .elseif index == 4
         ; index equal to 100 is illegal when use this function
         invoke ExitProcess, 1
-    .else if index == 5
+    .elseif index == 5
         mov al, 40
-    .else if index == 6
+    .elseif index == 6
         mov al, 48
-    .else if index == 7
+    .elseif index == 7
         mov al, 56
     .else
         ; index should be in [0, 8)
         invoke ExitProcess, 1
+    .endif
     ret
 IndexInSibValue endp
 
@@ -91,7 +94,7 @@ EncodeMrrSib proc, memBaseReg: dword, memScale: dword, memIndexReg: dword
         add mrr, 0 + 5
 
         mov cl, 0
-    .else if memBaseReg != -1 && memIndexReg == -1
+    .elseif memBaseReg != -1 && memIndexReg == -1
         ; base + displacement, use SIB, set index to 100
         ; MOD = 10, R/M = 100
         add mrr, 128 + 4
@@ -101,7 +104,7 @@ EncodeMrrSib proc, memBaseReg: dword, memScale: dword, memIndexReg: dword
         add sib, al
 
         mov cl, 1
-    .else if memBaseReg == -1 && memIndexReg != -1
+    .elseif memBaseReg == -1 && memIndexReg != -1
         ; index * scale + displacement
         ; MOD = 00, R/M = 100
         add mrr, 0 + 4
@@ -115,7 +118,7 @@ EncodeMrrSib proc, memBaseReg: dword, memScale: dword, memIndexReg: dword
         add mrr, 5
 
         mov cl, 1
-    .else if memBaseReg != -1 && memIndexReg != -1
+    .elseif memBaseReg != -1 && memIndexReg != -1
         ; base + index * scale + displacement
         ; MOD = 10, R/M = 100
         add mrr, 128 + 4
