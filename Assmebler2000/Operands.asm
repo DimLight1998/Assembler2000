@@ -20,6 +20,7 @@ readOperand proc uses edi, operAddr: ptr Operand
 	readIndexRegErr byte "read index register error", 10, 0
 	readScaleErr byte "read scale error", 10, 0
 	improperScaleErr byte "scale is expected to be 1, 2, 4, 8, got %d", 10, 0
+	junkCharAfterDisplacement byte "junk char after reading displacement", 10, 0
 .code
 	assume esi: ptr Token
 	mov edi, operAddr
@@ -182,6 +183,7 @@ readOperand proc uses edi, operAddr: ptr Operand
 				ret
 			.endif
 		.else
+			invoke crt_printf, addr junkCharAfterDisplacement
 			mov eax, 5
 			ret
 		.endif
