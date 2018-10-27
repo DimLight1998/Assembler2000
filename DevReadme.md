@@ -3,17 +3,17 @@
 ## 计划实现的指令
 
 - [x] ADD
-- [ ] SUB
-- [ ] MOV
+- [x] SUB
+- [x] MOV
 - [x] PUSH
 - [x] POP
-- [ ] OR
-- [ ] AND
-- [ ] XOR
+- [x] OR
+- [x] AND
+- [x] XOR
 - [x] NOT
-- [ ] CMP
+- [x] CMP
 - [x] TEST
-- [ ] LOOP
+- ~~LOOP~~
 - [x] CALL
 - [x] RETN
 - [ ] JMP
@@ -21,7 +21,7 @@
 - [x] INC
 - [x] DEC
 - [x] NEG
-- [ ] LEA
+- [x] LEA
 
 ## 编码指令开发流程
 

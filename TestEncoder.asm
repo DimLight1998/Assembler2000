@@ -53,11 +53,12 @@ TestMemReg proc uses eax ebx ecx edx esi edi,
     mov [eax + 1], mrr
     .if cl == 0
         mov edx, 2
-    .else if cl == 1
+    .elseif cl == 1
         mov [eax + 2], bl
         mov edx, 3
     .else
         invoke ExitProcess, 1
+    .endif
 
     mov ecx, memDisplacement
     mov dword ptr [eax + edx], ecx
@@ -105,11 +106,12 @@ TestMemImm proc uses eax ebx ecx edx esi edi,
     mov [edx + 1], al
     .if cl == 0
         mov eax, 2
-    .else if cl == 1
+    .elseif cl == 1
         mov [edx + 2], bl
         mov eax, 3
     .else
         invoke ExitProcess, 1
+    .endif
 
     mov ecx, memDisplacement
     mov dword ptr [edx + eax], ecx

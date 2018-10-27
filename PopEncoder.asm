@@ -45,11 +45,12 @@ PopMem proc uses eax ebx ecx edx esi edi,
     mov [eax + 1], mrr
     .if cl == 0
         mov edx, 2
-    .else if cl == 1
+    .elseif cl == 1
         mov [eax + 2], bl
         mov edx, 3
     .else
         invoke ExitProcess, 1
+    .endif
 
     ; set up displacement
     mov ecx, memDisplacement

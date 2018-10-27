@@ -17,7 +17,7 @@ CallReg proc uses eax ebx ecx edx esi edi,
     ; MOD = 11, R/M on sourceReg
     ; REG = 010 to enable CALL, set to other value will not be CALL
     local mrr byte
-    mov mrr, 192 + 2
+    mov mrr, 192 + 16
     add mrr, sourceReg
     mov [writeTo + 1], mrr
 
@@ -38,7 +38,7 @@ CallMem proc uses eax ebx ecx edx esi edi,
     ; mrr and sib
     ; REG = 010
     local mrr byte
-    mov mrr, 2
+    mov mrr, 16
     ; MOD and R/M, and SIB
     invoke EncodeMrrSib, memBaseReg, memScale, memIndexReg
     add mrr, al
@@ -47,11 +47,12 @@ CallMem proc uses eax ebx ecx edx esi edi,
 
     .if cl == 0
         mov edx, 2
-    .else if cl == 1
+    .elseif cl == 1
         mov [eax + 2], bl
         mov edx, 3
     .else
         invoke ExitProcess, 1
+    .endif
 
     mov ecx, memDisplacement
     mov dword ptr [eax + edx], ecx
