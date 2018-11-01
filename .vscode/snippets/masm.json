@@ -12,5 +12,12 @@
             "$1 endp"
         ],
         "description": "New encoding function"
+    }, 
+    "7A6E5ADBD7BB40669E9713616E299C2B": {
+        "prefix" : "sw",
+        "body" :[
+            ".elseif instruction == $1 && opCount == $2 && [edi].operandType == $3 && [edi + type Operand].operandType == $4",
+            "    $0"
+        ]
     }
 }

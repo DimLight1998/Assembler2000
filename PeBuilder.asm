@@ -113,18 +113,11 @@ includelib g:\masm32\lib\msvcrt.lib
     headerPadding label byte
         byte 480 dup(00h)
     headerPaddingSize = ($ - headerPadding) / type headerPadding
-    fileName byte "a.exe", 0
+    fileName byte "output.exe", 0
 .code
-
-GetSourceFile proc
-    
-GetSourceFile endp
 
 Main proc
     local fileHandle: dword
-
-    invoke GetCommandLine
-    invoke MessageBox, NULL, eax, addr szCaption, MB_OK
 
     invoke CreateFile, addr fileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0
     mov fileHandle, eax
