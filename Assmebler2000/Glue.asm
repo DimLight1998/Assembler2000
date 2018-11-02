@@ -104,26 +104,30 @@ middleGlue proc uses esi edi ebx
 	.code
 	
 	; move pointers to correct positions
+	push ebx
 	mov eax, dllCount
 	add eax, functionCount
 	shl eax, 2
 	add tableDllPointer, eax
-	mov importDirectoryTableBeginOffset, tableDllPointer ; used in afterGlue
+	mov ebx, tableDllPointer
+	mov importDirectoryTableBeginOffset, ebx ; used in afterGlue
 
 	mov eax, dllCount
 	inc eax
 	imul eax, 20
 	add eax, tableDllPointer
 	mov tableFunc2Pointer, eax
-	mov importDirectoryTableEndOffset, tableFunc2Pointer ; used in afterGlue
+	mov ebx, tableFunc2Pointer
+	mov importDirectoryTableEndOffset, ebx ; used in afterGlue
 
 	mov eax, dllCount
 	add eax, functionCount
 	shl eax, 2
 	add eax, tableFunc2Pointer
 	mov tableNamePointer, eax
-	
+	pop ebx
 	; pointers ready, action!
+	push ebx
 	mov esi, offset externTries
 	assume edi: ptr TrieNode
 	.while esi != currentExtern
@@ -134,18 +138,23 @@ middleGlue proc uses esi edi ebx
 		mov eax, tableFunc2Pointer
 		sub eax, offset rdataBuffer
 		add eax, rdataBase
-		mov ptr dword tableDllPointer, eax
+		mov ebx, tableDllPointer
+		mov [ebx], eax
 		add tableDllPointer, 4
-		mov ptr dword tableDllPointer, 0
+		mov ebx, tableDllPointer
+		mov [ebx], 0
 		add tableDllPointer, 4
-		mov ptr dword tableDllPointer, 0
+		mov ebx, tableDllPointer
+		mov [ebx], 0
 		add tableDllPointer, 4
-		mov ptr dword tableDllPointer, 0 ; fill it later
+		mov ebx, tableDllPointer
+		mov [ebx], 0 ; fill it later
 		add tableDllPointer, 4
 		mov eax, tableFunc1Pointer
 		sub eax, offset rdataBuffer
 		add eax, rdataBase
-		mov ptr dword tableDllPointer, eax
+		mov ebx, tableDllPointer
+		mov [ebx], eax
 
 		.while edi
 			; get rva
@@ -154,24 +163,28 @@ middleGlue proc uses esi edi ebx
 			add eax, rdataBase
 
 			; advance tableFunc1Pointer
-			mov ptr dword tableFunc1Pointer, eax
+			mov ebx, tableFunc1Pointer
+			mov [ebx], eax
 			add tableFunc1Pointer, 4
 
 			; advance tableFunc2Pointer
-			mov ptr dword tableFunc2Pointer, eax
+			mov ebx, tableFunc2Pointer
+			mov [ebx], eax
 			add tableFunc2Pointer, 4
 
 			; advance tableNamePointer
-			mov ptr word tableNamePointer, 0
+			mov ebx, tableNamePointer
+			mov word ptr [ebx], 0
 			add tableNamePointer, 2	
 			invoke crt_strlen, addr [edi].nodeStr
 			inc eax
 			push eax
-			invoke crt_strcpy, ptr byte tableNamePointer, addr [edi].nodeStr
+			invoke crt_strcpy, tableNamePointer, addr [edi].nodeStr
 			pop eax
 			add tableNamePointer, eax
 			.if tableNamePointer % 2 != 0
-				mov ptr byte tableNamePointer, 0
+				mov ebx, tableNamePointer
+				mov byte ptr [ebx], 0
 				inc tableNamePointer
 			.endif
 
@@ -180,17 +193,22 @@ middleGlue proc uses esi edi ebx
 		.endw
 
 		; advance tableFunc1Pointer
-		mov ptr dword tableFunc1Pointer, 0
+		mov ebx, tableFunc1Pointer
+		mov [ebx], 0
 		add tableFunc1Pointer, 4
 
 		; advance tableFunc2Pointer
-		mov ptr dword tableFunc2Pointer, 0
+		mov ebx, tableFunc2Pointer
+		mov [ebx], 0
 		add tableFunc2Pointer, 4
 
 		; set up tableDllPointer name field
 		sub tableDllPointer, 4
 		mov eax, tableNamePointer
-		mov ptr dword tableDllPointer, [tableNamePointer]
+		sub eax, offset rdataBuffer
+		add eax, rdataBase
+		mov ebx, tableDllPointer
+		mov [ebx], eax
 		add tableDllPointer, 8
 
 		; advance tableNamePointer
@@ -198,17 +216,19 @@ middleGlue proc uses esi edi ebx
 		invoke crt_strlen, addr [edi].nodeStr
 		inc eax
 		push eax
-		invoke crt_strcpy, ptr byte tableNamePointer, addr [edi].nodeStr
+		invoke crt_strcpy, tableNamePointer, addr [edi].nodeStr
 		pop eax
 		add tableNamePointer, eax
 		.if tableNamePointer % 2 != 0
-			mov ptr byte tableNamePointer, 0
+			mov	ebx, tableNamePointer
+			mov byte ptr [ebx], 0
 			inc tableNamePointer
 		.endif
 
 		; advance esi
 		add esi, type dword
 	.endw
+	pop ebx
 
 	; finally, insert an empty row to tableDllPointer
 	mov eax, tableDllPointer
@@ -470,26 +490,26 @@ afterGlue proc uses eax ebx ecx edx esi edi
 	add eax, numDataPage
 	inc eax ; this is for header
 	shl eax, 12
-	mov sizeOfImageDecideLater, eax ; REVIEW 
+	mov sizeOfImageDecideLater, eax
 
 	; import directory table and its size
 	mov eax, importDirectoryTableBeginOffset
 	sub eax, offset rdataBuffer
 	add eax, rdataBase
-	mov imageDataDirectoryFirstEntryDecideLater, eax ; REVIEW
-	mov ebx, offset imageDataDirectoryFirstEntryDecideLater ; REVIEW
+	mov imageDataDirectoryFirstEntryDecideLater, eax
+	mov ebx, offset imageDataDirectoryFirstEntryDecideLater
 	add ebx, 4
 	mov eax, importDirectoryTableEndOffset
 	sub eax, importDirectoryTableBeginOffset
-	mov ebx, eax
+	mov [ebx], eax
 
 	; text holes
 	mov eax, 1
 	shl eax, 12
-	mov textRvaDecideLater, eax ; REVIEW same below
+	mov textRvaDecideLater, eax
 	mov eax, numTextPageInFile
 	imul eax, 200h
-	mov textRawDataSizeDecideLater, eax ; REVIEW
+	mov textRawDataSizeDecideLater, eax
 	mov textRawDataOffsetDecideLater, 400h
 
 	; rdata holes

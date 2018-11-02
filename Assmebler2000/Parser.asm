@@ -507,42 +507,42 @@ encodeInstruction proc uses edi ebx, instruction: dword, strAddr: ptr byte
 	.elseif instruction == INSLEAL && opCount == 2 && [edi].operandType == OPER_MEM && [edi + type Operand].operandType == OPER_REG
 		invoke LeaRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, sizeOut
 	; dec
-	.elseif instruction == INSDECL && opCount == 2 && [edi].operandType == OPER_REG
+	.elseif instruction == INSDECL && opCount == 1 && [edi].operandType == OPER_REG
 		invoke DecReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, sizeOut
-	.elseif instruction == INSDECL && opCount == 2 && [edi].operandType == OPER_MEM
+	.elseif instruction == INSDECL && opCount == 1 && [edi].operandType == OPER_MEM
 		invoke DecMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, sizeOut
 	; inc
-	.elseif instruction == INSINCL && opCount == 2 && [edi].operandType == OPER_REG
+	.elseif instruction == INSINCL && opCount == 1 && [edi].operandType == OPER_REG
 		invoke IncReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, sizeOut
-	.elseif instruction == INSINCL && opCount == 2 && [edi].operandType == OPER_MEM
+	.elseif instruction == INSINCL && opCount == 1 && [edi].operandType == OPER_MEM
 		invoke IncMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, sizeOut
 	; neg
-	.elseif instruction == INSNEGL && opCount == 2 && [edi].operandType == OPER_REG
+	.elseif instruction == INSNEGL && opCount == 1 && [edi].operandType == OPER_REG
 		invoke NegReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, sizeOut
-	.elseif instruction == INSNEGL && opCount == 2 && [edi].operandType == OPER_MEM
+	.elseif instruction == INSNEGL && opCount == 1 && [edi].operandType == OPER_MEM
 		invoke NegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, sizeOut
 	; not
-	.elseif instruction == INSNOTL && opCount == 2 && [edi].operandType == OPER_REG
+	.elseif instruction == INSNOTL && opCount == 1 && [edi].operandType == OPER_REG
 		invoke NotReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, sizeOut
-	.elseif instruction == INSNOTL && opCount == 2 && [edi].operandType == OPER_MEM
+	.elseif instruction == INSNOTL && opCount == 1 && [edi].operandType == OPER_MEM
 		invoke NotMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, sizeOut
 	; pop
-	.elseif instruction == INSPUSHL && opCount == 2 && [edi].operandType == OPER_REG
+	.elseif instruction == INSPUSHL && opCount == 1 && [edi].operandType == OPER_REG
 		invoke PushReg, -1, 1, -1, 0, 0, -1, [edi].sourceReg, startAddr, sizeOut
-	.elseif instruction == INSPUSHL && opCount == 2 && [edi].operandType == OPER_MEM
+	.elseif instruction == INSPUSHL && opCount == 1 && [edi].operandType == OPER_MEM
 		invoke PushMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, sizeOut
 	; push
-	.elseif instruction == INSPUSHL && opCount == 2 && [edi].operandType == OPER_REG
+	.elseif instruction == INSPUSHL && opCount == 1 && [edi].operandType == OPER_REG
 		invoke PushReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, sizeOut
-	.elseif instruction == INSPUSHL && opCount == 2 && [edi].operandType == OPER_MEM
+	.elseif instruction == INSPUSHL && opCount == 1 && [edi].operandType == OPER_MEM
 		invoke PushMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, sizeOut
 	; call
-	.elseif instruction == INSCALL && opCount == 2 && [edi].operandType == OPER_REG
+	.elseif instruction == INSCALL && opCount == 1 && [edi].operandType == OPER_REG
 		invoke CallReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, sizeOut
-	.elseif instruction == INSCALL && opCount == 2 && [edi].operandType == OPER_MEM
+	.elseif instruction == INSCALL && opCount == 1 && [edi].operandType == OPER_MEM
 		invoke CallMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, sizeOut
 	; ret
-	.elseif instruction == INSRET
+	.elseif instruction == INSRET && opCount == 0
 		invoke RetOnly, -1, 1, -1, 0, 0, -1, -1, startAddr, sizeOut
 	.else
 		invoke crt_printf, addr invalidInstruction, strAddr

@@ -1,7 +1,6 @@
-.386
-.model flat, stdcall
-option casemap:none
+include EncoderUtils.inc
 
+.code
 ; return the value of REG in MEM-REG-R/M in al
 RegInMemRegRmValue proc, reg: dword
     .if reg == 0
@@ -79,8 +78,8 @@ IndexInSibValue endp
 ; return whether SIB is used in cl, 0 for not used, 1 for used
 EncodeMrrSib proc, memBaseReg: dword, memScale: dword, memIndexReg: dword
 
-    local mrr byte
-    local sib byte
+    local mrr: byte
+    local sib: byte
     mov mrr, 0
     mov sib, 0
 
@@ -113,7 +112,7 @@ EncodeMrrSib proc, memBaseReg: dword, memScale: dword, memIndexReg: dword
         invoke ScaleInSibValue, memScale
         add mrr, al
         mov eax, 0
-        invoke IndexInSibValue, memIndex
+        invoke IndexInSibValue, memIndexReg
         add mrr, al
         add mrr, 5
 
@@ -137,6 +136,7 @@ EncodeMrrSib proc, memBaseReg: dword, memScale: dword, memIndexReg: dword
         mov cl, 1
     .else
         invoke ExitProcess, 1
+	.endif
 
     mov eax, 0
     mov ebx, 0
@@ -146,3 +146,4 @@ EncodeMrrSib proc, memBaseReg: dword, memScale: dword, memIndexReg: dword
 
     ret
 EncodeMrrSib endp
+end

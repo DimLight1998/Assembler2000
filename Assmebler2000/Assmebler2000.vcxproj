@@ -70,7 +70,26 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>G:\masm32\include</IncludePath>
+    <ReferencePath>G:\masm32\include</ReferencePath>
+    <LibraryPath>G:\masm32\lib</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>G:\masm32\include</IncludePath>
+    <ReferencePath>G:\masm32\include</ReferencePath>
+    <LibraryPath>G:\masm32\lib</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>G:\masm32\include</IncludePath>
+    <ReferencePath>G:\masm32\include</ReferencePath>
+    <LibraryPath>G:\masm32\lib</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>G:\masm32\include</IncludePath>
+    <ReferencePath>G:\masm32\include</ReferencePath>
+    <LibraryPath>G:\masm32\lib</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -79,12 +98,12 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <MASM>
-      <IncludePaths>D:\masm32\include</IncludePaths>
+      <IncludePaths>G:\masm32\include</IncludePaths>
       <UseSafeExceptionHandlers>true</UseSafeExceptionHandlers>
     </MASM>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>D:\masm32\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>G:\masm32\lib</AdditionalLibraryDirectories>
       <EntryPointSymbol>
       </EntryPointSymbol>
     </Link>
@@ -96,6 +115,14 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>G:\masm32\lib</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <MASM>
+      <IncludePaths>G:\masm32\include</IncludePaths>
+      <UseSafeExceptionHandlers>true</UseSafeExceptionHandlers>
+    </MASM>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -109,7 +136,13 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>G:\masm32\lib</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
     </Link>
+    <MASM>
+      <IncludePaths>G:\masm32\include</IncludePaths>
+      <UseSafeExceptionHandlers>true</UseSafeExceptionHandlers>
+    </MASM>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -123,9 +156,33 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>G:\masm32\lib</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
     </Link>
+    <MASM>
+      <IncludePaths>G:\masm32\include</IncludePaths>
+      <UseSafeExceptionHandlers>true</UseSafeExceptionHandlers>
+    </MASM>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <MASM Include="..\AddEncoder.asm" />
+    <MASM Include="..\AndEncoder.asm" />
+    <MASM Include="..\CallEncoder.asm" />
+    <MASM Include="..\CmpEncoder.asm" />
+    <MASM Include="..\DecEncoder.asm" />
+    <MASM Include="..\EncoderUtils.asm" />
+    <MASM Include="..\IncEncoder.asm" />
+    <MASM Include="..\LeaEncoder.asm" />
+    <MASM Include="..\MovEncoder.asm" />
+    <MASM Include="..\NegEncoder.asm" />
+    <MASM Include="..\NotEncoder.asm" />
+    <MASM Include="..\OrEncoder.asm" />
+    <MASM Include="..\PopEncoder.asm" />
+    <MASM Include="..\PushEncoder.asm" />
+    <MASM Include="..\RetnEncoder.asm" />
+    <MASM Include="..\SubEncoder.asm" />
+    <MASM Include="..\TestEncoder.asm" />
+    <MASM Include="..\XorEncoder.asm" />
     <MASM Include="Expression.asm" />
     <MASM Include="Glue.asm" />
     <MASM Include="LineControl.asm" />
@@ -166,6 +223,9 @@
     <ClInclude Include="Operands.inc">
       <FileType>Document</FileType>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\EncoderUtils.inc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

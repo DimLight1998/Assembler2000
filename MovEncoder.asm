@@ -4,17 +4,18 @@ option casemap:none
 
 include EncoderUtils.inc
 
-
+.code
 MovMemReg proc uses eax ebx ecx edx esi edi,
     memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword,
     immediateValue: dword, sourceReg: dword, destinationReg: dword,
     writeTo: ptr byte, sizeOut: ptr byte
 
+    local mrr: byte
+
     ; opcode
-    mov [writeTo], 089h
+    mov byte ptr [writeTo], 089h
 
     ; get mrr and sib, mrr is for 'MOD-REG-R/M'
-    local mrr: byte
     mov mrr, 0
     ; set up REG
     invoke RegInMemRegRmValue, sourceReg
@@ -23,11 +24,12 @@ MovMemReg proc uses eax ebx ecx edx esi edi,
     invoke EncodeMrrSib, memBaseReg, memScale, memIndexReg
     add mrr, al
     mov eax, writeTo
-    mov [eax + 1], mrr
+    mov bl, mrr
+    mov byte ptr [eax + 1], bl
     .if cl == 0
         mov edx, 2
     .elseif cl == 1
-        mov [eax + 2], bl
+        mov byte ptr [eax + 2], bl
         mov edx, 3
     .else
         invoke ExitProcess, 1
@@ -51,15 +53,13 @@ MovRegReg proc uses eax ebx ecx edx esi edi,
     ; size of the code will be stored in ebx
 
     ; get opcode
-    local opcode: byte
-    mov opcode, 08Bh
+    local mrr: byte
+    local sib: byte
     ; write opcode
-    mov [writeTo], opcode
+    mov byte ptr [writeTo], 08Bh
 
     ; get mrr and sib, mrr is for 'MOD-REG-R/M'
-    local mrr: byte
     mov mrr, 0
-    local sib: byte
     mov sib, 0
     ; set up REG
     invoke RegInMemRegRmValue, destinationReg
@@ -67,9 +67,10 @@ MovRegReg proc uses eax ebx ecx edx esi edi,
     ; MOD = 11, R/M = sourceReg
     add mrr, 192
     mov ecx, sourceReg
-    add mrr, ecx
+    add mrr, cl
     ; write mrr
-    mov [writeTo + 1], mrr
+    mov bl, mrr
+    mov byte ptr [writeTo + 1], bl
     
     ; this operation always has only 2 bytes
     mov [sizeOut], 2
@@ -83,11 +84,12 @@ MovRegMem proc uses eax ebx ecx edx esi edi,
     immediateValue: dword, sourceReg: dword, destinationReg: dword,
     writeTo: ptr byte, sizeOut: ptr byte
 
+    local mrr: byte
+
     ; opcode
-    mov [writeTo], 08Bh
+    mov byte ptr [writeTo], 08Bh
 
     ; get mrr and sib, mrr is for 'MOD-REG-R/M'
-    local mrr: byte
     mov mrr, 0
     ; set up REG
     invoke RegInMemRegRmValue, destinationReg
@@ -96,11 +98,12 @@ MovRegMem proc uses eax ebx ecx edx esi edi,
     invoke EncodeMrrSib, memBaseReg, memScale, memIndexReg
     add mrr, al
     mov eax, writeTo
-    mov [eax + 1], mrr
+    mov bl, mrr
+    mov byte ptr [eax + 1], bl
     .if cl == 0
         mov edx, 2
     .elseif cl == 1
-        mov [eax + 2], bl
+        mov byte ptr [eax + 2], bl
         mov edx, 3
     .else
         invoke ExitProcess, 1
@@ -124,21 +127,20 @@ MovRegImm proc uses eax ebx ecx edx esi edi,
     ; size of the code will be stored in ebx
 
     ; get opcode
-    local opcode: byte
-
-    mov opcode, 0C7h
+    local mrr: byte
 
     ; write opcode
-    mov [writeTo], opcode
+    mov byte ptr [writeTo], 0C7h
 
     ; get mrr, mrr is for 'MOD-REG-R/M'
-    local mrr: byte
     mov mrr, 0
 
     ; MOD = 11, REG = 000, R/M = destinationReg
     add mrr, 192
-    add mrr, destinationReg
-    mov [writeTo + 1], mrr
+    mov ebx, destinationReg
+    add mrr, bl
+    mov bl, mrr
+    mov byte ptr [writeTo + 1], bl
     mov ebx, 2
 
     ; set up constant
@@ -158,11 +160,12 @@ MovMemImm proc uses eax ebx ecx edx esi edi,
     immediateValue: dword, sourceReg: dword, destinationReg: dword,
     writeTo: ptr byte, sizeOut: ptr byte
 
+    local mrr: byte
+
     ; opcode
-    mov [writeTo], 0C7h
+    mov byte ptr [writeTo], 0C7h
 
     ; get mrr and sib, mrr is for 'MOD-REG-R/M'
-    local mrr: byte
     mov mrr, 0
     ; set up REG
     ; REG = 000
@@ -170,11 +173,12 @@ MovMemImm proc uses eax ebx ecx edx esi edi,
     invoke EncodeMrrSib, memBaseReg, memScale, memIndexReg
     add mrr, al
     mov eax, writeTo
-    mov [eax + 1], mrr
+    mov bl, mrr
+    mov byte ptr [eax + 1], bl
     .if cl == 0
         mov edx, 2
     .elseif cl == 1
-        mov [eax + 2], bl
+        mov byte ptr [eax + 2], bl
         mov edx, 3
     .else
         invoke ExitProcess, 1
@@ -193,3 +197,4 @@ MovMemImm proc uses eax ebx ecx edx esi edi,
     
     ret
 MovMemImm endp
+end

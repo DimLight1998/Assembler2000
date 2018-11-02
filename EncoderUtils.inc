@@ -1,3 +1,5 @@
+include Assmebler2000/common.inc
+
 RegInMemRegRmValue proto, reg: dword
 ScaleInSibValue proto, scale: dword
 IndexInSibValue proto, index: dword

@@ -19,5 +19,11 @@
             ".elseif instruction == $1 && opCount == $2 && [edi].operandType == $3 && [edi + type Operand].operandType == $4",
             "    $0"
         ]
+    },
+    "ohno" :{
+        "prefix": "bp",
+        "body": [
+            "byte ptr"
+        ]
     }
 }

@@ -39,6 +39,60 @@
     <MASM Include="Operands.asm">
       <Filter>源文件</Filter>
     </MASM>
+    <MASM Include="..\AddEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\AndEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\CallEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\CmpEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\DecEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\EncoderUtils.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\IncEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\LeaEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\MovEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\NegEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\NotEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\OrEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\PopEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\PushEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\RetnEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\SubEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\TestEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\XorEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.inc">
@@ -62,9 +116,12 @@
     <ClInclude Include="Tokenizer.inc">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Operands.inc">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Operands.inc">
+    <None Include="..\EncoderUtils.inc">
       <Filter>头文件</Filter>
     </None>
   </ItemGroup>

@@ -2,10 +2,11 @@
 .model flat, stdcall
 option casemap: none
 
-include	windows.inc
-include kernel32.inc
-include user32.inc
-include msvcrt.inc
+include ..\..\..\masm32\include\windows.inc 
+include ..\..\..\masm32\include\kernel32.inc
+include ..\..\..\masm32\include\user32.inc
+include ..\..\..\masm32\include\msvcrt.inc
+
 includelib msvcrt.lib
 
 m2m macro m1, m2
