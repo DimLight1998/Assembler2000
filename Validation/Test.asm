@@ -26,21 +26,23 @@ main proc
     ;==========================================
     ; MEM
     ; 11335577
-    invoke CallMem, -1, 1, -1, 11335577h, 0, -1, -1, addr encoded, addr encodedLength
+    ; invoke JmpMem, -1, 1, -1, 11335577h, 0, -1, -1, addr encoded, addr encodedLength
 
     ; 2 * ebx + 1223344
-    ; invoke PushMem, -1, 2, 3, 01223344h, 0, -1, -1, addr encoded, addr encodedLength
+    ; invoke JmpMem, -1, 2, 3, 01223344h, 0, -1, -1, addr encoded, addr encodedLength
 
     ; ecx + 22334455
-    ; invoke PushMem, 1, 1, -1, 22334455h, 0, -1, -1, addr encoded, addr encodedLength
+    ; invoke JmpMem, 1, 1, -1, 22334455h, 0, -1, -1, addr encoded, addr encodedLength
 
     ; esi + 8 * edi + abbccdd
-    ; invoke PushMem, 6, 8, 7, 00abbccddh, 0, -1, -1, addr encoded, addr encodedLength
+    ; invoke JmpMem, 6, 8, 7, 00abbccddh, 0, -1, -1, addr encoded, addr encodedLength
 
     ;==========================================
     ; REG
     ; ebx
-    ; invoke PushReg, -1, 1, -1, 0, 0, 3, -1, addr encoded, addr encodedLength
+    ; invoke JmpReg, -1, 1, -1, 0, 0, 3, -1, addr encoded, addr encodedLength
+
+    invoke JzRel, -1, 1, -1, 0, 11335577h, -1, -1, addr encoded, addr encodedLength
 
     ;===========================================
     ; MEM IMM

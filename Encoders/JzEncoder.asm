@@ -10,11 +10,12 @@ JzRel proc uses eax ebx ecx edx esi edi,
     writeTo: ptr byte, sizeOut: ptr byte
 
     ; opcode
-    mov [writeTo], 0F84h
-
-   ; followed by immediateValue, immediatly
     mov eax, writeTo
-	mov ebx, immediateValue
+    mov word ptr [eax], 840Fh
+
+    ; followed by immediateValue, immediatly
+    mov eax, writeTo
+    mov ebx, immediateValue
     mov dword ptr [eax + 2], ebx
     mov eax, sizeOut
     mov dword ptr [eax], 6
