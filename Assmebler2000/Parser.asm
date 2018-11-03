@@ -371,7 +371,7 @@ printOperand proc uses edi, operAddr: ptr Operand
 printOperand endp
 
 encodeInstruction proc uses edi ebx, instruction: dword, strAddr: ptr byte
-	local opCount: dword, startAddr: dword, sizeOut: dword
+	local opCount: dword, startAddr: dword, sizeOut: dword, locationCounter: dword
 .data
 	invalidInstruction byte "no matching instruction %s ",0
 	regPat byte "reg32", 0
@@ -411,8 +411,10 @@ encodeInstruction proc uses edi ebx, instruction: dword, strAddr: ptr byte
 	.endif
 
 	mov eax, currentSection
-	mov eax, (Section ptr [eax]).currentCursor
-	mov startAddr, eax
+	mov ebx, (Section ptr [eax]).currentCursor
+	mov startAddr, ebx
+	mov ebx, (Section ptr [eax]).locationCounter
+	mov locationCounter, ebx
 	mov sizeOut, 0
 
 	mov edi, offset operands
@@ -544,15 +546,19 @@ encodeInstruction proc uses edi ebx, instruction: dword, strAddr: ptr byte
 	.elseif instruction == INSCALL && opCount == 1 && [edi].operandType == OPER_MEM
 		invoke CallMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, addr sizeOut
 	; jmp
+	.elseif instruction == INSJMP && opCount == 1 && [edi].operandType == OPER_MEM && [edi].baseReg == -1 && [edi].indexReg == -1
+		mov ebx, [edi].displacement
+		sub ebx, locationCounter
+		invoke JmpRel, -1, 1, -1, 0, ebx, -1, -1, startAddr, addr sizeOut
 	.elseif instruction == INSJMP && opCount == 1 && [edi].operandType == OPER_REG
 		invoke JmpReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSJMP && opCount == 1 && [edi].operandType == OPER_MEM
 		invoke JmpMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, addr sizeOut
-	.elseif instruction == INSJMP && opCount == 1 && [edi].operandType == OPER_IMM
-		invoke JmpRel, -1, 1, -1, 0, [edi].displacement, -1, -1, startAddr, addr sizeOut
 	; jz
-	.elseif instruction == INSJZ && opCount == 1 && [edi].operandType == OPER_IMM
-		invoke JzRel, -1, 1, -1, 0, [edi].displacement, -1, -1, startAddr, addr sizeOut
+	.elseif instruction == INSJZ && opCount == 1 && [edi].operandType == OPER_MEM && [edi].baseReg == -1 && [edi].indexReg == -1 ; relative address
+		mov ebx, [edi].displacement
+		sub ebx, locationCounter
+		invoke JzRel, -1, 1, -1, 0, ebx, -1, -1, startAddr, addr sizeOut
 	; ret
 	.elseif instruction == INSRET && opCount == 0
 		invoke RetOnly, -1, 1, -1, 0, 0, -1, -1, startAddr, addr sizeOut
