@@ -16,6 +16,7 @@ JzRel proc uses eax ebx ecx edx esi edi,
     ; followed by immediateValue, immediatly
     mov eax, writeTo
     mov ebx, immediateValue
+    sub ebx, 6
     mov dword ptr [eax + 2], ebx
     mov eax, sizeOut
     mov dword ptr [eax], 6
