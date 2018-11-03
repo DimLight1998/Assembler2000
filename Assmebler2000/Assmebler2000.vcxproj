@@ -173,6 +173,8 @@
     <MASM Include="..\Encoders\CmpEncoder.asm" />
     <MASM Include="..\Encoders\DecEncoder.asm" />
     <MASM Include="..\Encoders\IncEncoder.asm" />
+    <MASM Include="..\Encoders\JmpEncoder.asm" />
+    <MASM Include="..\Encoders\JzEncoder.asm" />
     <MASM Include="..\Encoders\LeaEncoder.asm" />
     <MASM Include="..\Encoders\MovEncoder.asm" />
     <MASM Include="..\Encoders\NegEncoder.asm" />

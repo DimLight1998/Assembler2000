@@ -2,8 +2,8 @@
 .model flat, stdcall
 option casemap:none
 
-include EncoderUtils.inc
-
+include ../EncoderUtils.inc
+.code
 JzRel proc uses eax ebx ecx edx esi edi,
     memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword,
     immediateValue: dword, sourceReg: dword, destinationReg: dword,
@@ -22,3 +22,4 @@ JzRel proc uses eax ebx ecx edx esi edi,
 
     ret
 JzRel endp
+end

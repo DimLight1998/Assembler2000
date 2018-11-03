@@ -93,6 +93,12 @@
     <MASM Include="..\Encoders\XorEncoder.asm">
       <Filter>源文件</Filter>
     </MASM>
+    <MASM Include="..\Encoders\JmpEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\Encoders\JzEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.inc">

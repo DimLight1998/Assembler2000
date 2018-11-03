@@ -2,8 +2,9 @@
 .model flat, stdcall
 option casemap:none
 
-include EncoderUtils.inc
+include ../EncoderUtils.inc
 
+.code
 JmpRel proc uses eax ebx ecx edx esi edi,
     memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword,
     immediateValue: dword, sourceReg: dword, destinationReg: dword,
@@ -88,3 +89,4 @@ JmpMem proc uses eax ebx ecx edx esi edi,
     
     ret
 JmpMem endp
+end

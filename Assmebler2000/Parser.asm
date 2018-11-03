@@ -527,10 +527,10 @@ encodeInstruction proc uses edi ebx, instruction: dword, strAddr: ptr byte
 	.elseif instruction == INSNOTL && opCount == 1 && [edi].operandType == OPER_MEM
 		invoke NotMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, addr sizeOut
 	; pop
-	.elseif instruction == INSPUSHL && opCount == 1 && [edi].operandType == OPER_REG
-		invoke PushReg, -1, 1, -1, 0, 0, -1, [edi].baseReg, startAddr, addr sizeOut
-	.elseif instruction == INSPUSHL && opCount == 1 && [edi].operandType == OPER_MEM
-		invoke PushMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, addr sizeOut
+	.elseif instruction == INSPOPL && opCount == 1 && [edi].operandType == OPER_REG
+		invoke PopReg, -1, 1, -1, 0, 0, -1, [edi].baseReg, startAddr, addr sizeOut
+	.elseif instruction == INSPOPL && opCount == 1 && [edi].operandType == OPER_MEM
+		invoke PopMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, addr sizeOut
 	; push
 	.elseif instruction == INSPUSHL && opCount == 1 && [edi].operandType == OPER_REG
 		invoke PushReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, addr sizeOut
@@ -543,6 +543,16 @@ encodeInstruction proc uses edi ebx, instruction: dword, strAddr: ptr byte
 		invoke CallReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSCALL && opCount == 1 && [edi].operandType == OPER_MEM
 		invoke CallMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, addr sizeOut
+	; jmp
+	.elseif instruction == INSJMP && opCount == 1 && [edi].operandType == OPER_REG
+		invoke JmpReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, addr sizeOut
+	.elseif instruction == INSJMP && opCount == 1 && [edi].operandType == OPER_MEM
+		invoke JmpMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, addr sizeOut
+	.elseif instruction == INSJMP && opCount == 1 && [edi].operandType == OPER_IMM
+		invoke JmpRel, -1, 1, -1, 0, [edi].displacement, -1, -1, startAddr, addr sizeOut
+	; jz
+	.elseif instruction == INSJZ && opCount == 1 && [edi].operandType == OPER_IMM
+		invoke JzRel, -1, 1, -1, 0, [edi].displacement, -1, -1, startAddr, addr sizeOut
 	; ret
 	.elseif instruction == INSRET && opCount == 0
 		invoke RetOnly, -1, 1, -1, 0, 0, -1, -1, startAddr, addr sizeOut
