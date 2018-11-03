@@ -8,7 +8,8 @@ include SymbolDict.inc
 .data
 	inMode byte "r", 0
 	outMode byte "w", 0
-	inFileName byte "input.s", 0
+	inFileName byte "input.s", 0, 200 dup(0)
+	outFileName byte "output.exe", 0, 200 dup(0)
 .data?
 	lineLength dword ? ; line length in bytes
 	lineEnd dword ? ; line end address
@@ -19,9 +20,6 @@ include SymbolDict.inc
 
 	fin dword ?
 	fout dword ?
-
-	; inFileName byte FileNameLength dup(?) todo
-	; outFileName byte FileNameLength dup(?)
 
 	lineErrorFlag byte ?
 	totalErrorCount dword ?

@@ -7,8 +7,6 @@ include kernel32.inc
 include user32.inc
 include msvcrt.inc
 
-includelib msvcrt.lib
-
 m2m macro m1, m2
 	mov eax,m2
 	mov m1,eax

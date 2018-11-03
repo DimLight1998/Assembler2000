@@ -21,6 +21,7 @@ readOperand proc uses edi, operAddr: ptr Operand
 	readScaleErr byte "read scale error", 10, 0
 	improperScaleErr byte "scale is expected to be 1, 2, 4, 8, got %d", 10, 0
 	junkCharAfterDisplacement byte "junk char after reading displacement", 10, 0
+	espCannotBeIndexErr byte "register %%esp cannot be index", 10, 0
 .code
 	assume esi: ptr Token
 	mov edi, operAddr
@@ -148,6 +149,11 @@ readOperand proc uses edi, operAddr: ptr Operand
 			invoke getTrieItem, addr [esi].tokenStr
 			mov eax, (TrieNode ptr [eax]).nodeVal
 			mov [edi].indexReg, eax
+			.if [edi].indexReg == 4 ; esp
+				invoke crt_printf, addr espCannotBeIndexErr
+				mov eax, 17
+				ret
+			.endif
 			add esi, type Token
 
 			.if [esi].tokenType == TOKEN_MEM_RIGHTBRA ;(%ebx,%esi)
