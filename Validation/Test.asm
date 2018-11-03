@@ -42,7 +42,7 @@ main proc
     ; ebx
     ; invoke JmpReg, -1, 1, -1, 0, 0, 3, -1, addr encoded, addr encodedLength
 
-    invoke JzRel, -1, 1, -1, 0, 11335577h, -1, -1, addr encoded, addr encodedLength
+    ; invoke JzRel, -1, 1, -1, 0, 11335577h, -1, -1, addr encoded, addr encodedLength
 
     ;===========================================
     ; MEM IMM
@@ -95,7 +95,7 @@ main proc
     ;===========================================
     ; REG REG
     ; edx, ecx
-    ; invoke XorRegReg, -1, 1, -1, 0, 0, 1, 2, addr encoded, addr encodedLength
+    ; invoke MovRegReg, -1, 1, -1, 0, 0, 1, 2, addr encoded, addr encodedLength
 
     ; esi, edi
     ; invoke XorRegReg, -1, 1, -1, 0, 0, 7, 6, addr encoded, addr encodedLength

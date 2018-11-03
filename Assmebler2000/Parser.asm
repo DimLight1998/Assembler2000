@@ -423,7 +423,7 @@ encodeInstruction proc uses edi ebx, instruction: dword, strAddr: ptr byte
 	.if instruction == INSADDL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_MEM
 		invoke AddMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSADDL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_REG
-		invoke AddRegReg, -1, 1, -1, 0, 0, [edi + type Operand].baseReg, [edi].baseReg, startAddr, addr sizeOut
+		invoke AddRegReg, -1, 1, -1, 0, 0, [edi].baseReg, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSADDL && opCount == 2 && [edi].operandType == OPER_MEM && [edi + type Operand].operandType == OPER_REG
 		invoke AddRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSADDL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_REG
@@ -434,7 +434,7 @@ encodeInstruction proc uses edi ebx, instruction: dword, strAddr: ptr byte
 	.elseif instruction == INSANDL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_MEM
 		invoke AndMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSANDL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_REG
-		invoke AndRegReg, -1, 1, -1, 0, 0, [edi + type Operand].baseReg, [edi].baseReg, startAddr, addr sizeOut
+		invoke AndRegReg, -1, 1, -1, 0, 0, [edi].baseReg, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSANDL && opCount == 2 && [edi].operandType == OPER_MEM && [edi + type Operand].operandType == OPER_REG
 		invoke AndRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSANDL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_REG
@@ -445,7 +445,7 @@ encodeInstruction proc uses edi ebx, instruction: dword, strAddr: ptr byte
 	.elseif instruction == INSCMPL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_MEM
 		invoke CmpMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSCMPL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_REG
-		invoke CmpRegReg, -1, 1, -1, 0, 0, [edi + type Operand].baseReg, [edi].baseReg, startAddr, addr sizeOut
+		invoke CmpRegReg, -1, 1, -1, 0, 0, [edi].baseReg, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSCMPL && opCount == 2 && [edi].operandType == OPER_MEM && [edi + type Operand].operandType == OPER_REG
 		invoke CmpRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSCMPL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_REG
@@ -456,7 +456,7 @@ encodeInstruction proc uses edi ebx, instruction: dword, strAddr: ptr byte
 	.elseif instruction == INSMOVL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_MEM
 		invoke MovMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSMOVL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_REG
-		invoke MovRegReg, -1, 1, -1, 0, 0, [edi + type Operand].baseReg, [edi].baseReg, startAddr, addr sizeOut
+		invoke MovRegReg, -1, 1, -1, 0, 0, [edi].baseReg, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSMOVL && opCount == 2 && [edi].operandType == OPER_MEM && [edi + type Operand].operandType == OPER_REG
 		invoke MovRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSMOVL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_REG
@@ -467,7 +467,7 @@ encodeInstruction proc uses edi ebx, instruction: dword, strAddr: ptr byte
 	.elseif instruction == INSORL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_MEM
 		invoke OrMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSORL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_REG
-		invoke OrRegReg, -1, 1, -1, 0, 0, [edi + type Operand].baseReg, [edi].baseReg, startAddr, addr sizeOut
+		invoke OrRegReg, -1, 1, -1, 0, 0, [edi].baseReg, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSORL && opCount == 2 && [edi].operandType == OPER_MEM && [edi + type Operand].operandType == OPER_REG
 		invoke OrRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSORL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_REG
@@ -478,7 +478,7 @@ encodeInstruction proc uses edi ebx, instruction: dword, strAddr: ptr byte
 	.elseif instruction == INSSUBL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_MEM
 		invoke SubMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSSUBL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_REG
-		invoke SubRegReg, -1, 1, -1, 0, 0, [edi + type Operand].baseReg, [edi].baseReg, startAddr, addr sizeOut
+		invoke SubRegReg, -1, 1, -1, 0, 0, [edi].baseReg, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSSUBL && opCount == 2 && [edi].operandType == OPER_MEM && [edi + type Operand].operandType == OPER_REG
 		invoke SubRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSSUBL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_REG
@@ -489,7 +489,7 @@ encodeInstruction proc uses edi ebx, instruction: dword, strAddr: ptr byte
 	.elseif instruction == INSXORL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_MEM
 		invoke XorMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSXORL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_REG
-		invoke XorRegReg, -1, 1, -1, 0, 0, [edi + type Operand].baseReg, [edi].baseReg, startAddr, addr sizeOut
+		invoke XorRegReg, -1, 1, -1, 0, 0, [edi].baseReg, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSXORL && opCount == 2 && [edi].operandType == OPER_MEM && [edi + type Operand].operandType == OPER_REG
 		invoke XorRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSXORL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_REG
@@ -500,7 +500,7 @@ encodeInstruction proc uses edi ebx, instruction: dword, strAddr: ptr byte
 	.elseif instruction == INSTESTL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_MEM
 		invoke TestMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSTESTL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_REG
-		invoke TestRegReg, -1, 1, -1, 0, 0, [edi + type Operand].baseReg, [edi].baseReg, startAddr, addr sizeOut
+		invoke TestRegReg, -1, 1, -1, 0, 0, [edi].baseReg, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSTESTL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_REG
 		invoke TestRegImm, -1, 1, -1, 0, [edi].displacement, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSTESTL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_MEM

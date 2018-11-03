@@ -11,13 +11,14 @@
 .import "User32.dll",   DefWindowProcA
 .import "Kernel32.dll", ExitProcess
 .import "Kernel32.dll", GetModuleHandleA
+.import "msvcrt.dll",   printf
 
 
 COLOR_WINDOW            = 5
 IDI_APPLICATION         = 32512
 IDC_ARROW               = 32512
 INT_MIN                 = -2147483647 - 1
-COMMON_WINDOW_STYLE     = 294584320
+COMMON_WINDOW_STYLE     = 0x118f0000
 WM_LBUTTONDOWN          = 513
 WM_CREATE               = 1
 WM_CLOSE                = 16
@@ -57,7 +58,6 @@ MsgLParam:              .long 0
 MsgTime:                .long 0    
 MsgPtX:                 .long 0
 MsgPtY:                 .long 0
-MsgLPrivate:            .long 0       
 
 WinRect:                
 WinRectLeft:            .long 0
@@ -91,6 +91,11 @@ HInstance:              .long 0
     call    RegisterClassA
     addl    $4, %esp
 
+    pushl   $CloseMsg
+    call    printf
+    addl    $4, %esp
+
+
     pushl   $0
     pushl   HInstance
     pushl   $0
@@ -106,6 +111,12 @@ HInstance:              .long 0
     call    CreateWindowExA
     addl    $48, %esp
     movl    %eax, HMainWnd
+
+    
+    pushl   $CloseMsg
+    call    printf
+    addl    $4, %esp
+
 
     pushl   $5
     pushl   HMainWnd
@@ -147,7 +158,7 @@ WinProc:
     pushl   %ebp
     movl    %esp, %ebp
 
-    movl    8(%ebp), %eax
+    movl    12(%ebp), %eax
 
 TEST_EAX_EQ_WM_LBUTTONDOWN:
     cmpl    $WM_LBUTTONDOWN, %eax
@@ -157,7 +168,7 @@ EAX_EQ_WM_LBUTTONDOWN:
     pushl   $0
     pushl   $PopupTitle
     pushl   $PopupText
-    pushl   4(%ebp)
+    pushl   8(%ebp)
     call    MessageBoxA
     addl    $16, %esp
     jmp     WINPROC_EXIT
@@ -169,7 +180,7 @@ EAX_EQ_WM_CREATE:
     pushl   $0
     pushl   $AppLoadMsgTitle
     pushl   $AppLoadMsgText
-    pushl   4(%ebp)
+    pushl   8(%ebp)
     call    MessageBoxA
     addl    $16, %esp
     jmp     WINPROC_EXIT
@@ -181,7 +192,7 @@ EAX_EQ_WM_CLOSE:
     pushl   $0
     pushl   $WindowName
     pushl   $CloseMsg
-    pushl   4(%ebp)
+    pushl   8(%ebp)
     call    MessageBoxA
     addl    $16, %esp
     
@@ -196,15 +207,15 @@ EAX_EQ_WM_KEYDOWN:
     pushl   $0
     pushl   $IAmHitTitle
     pushl   $IAmHitText
-    pushl   4(%ebp)
+    pushl   8(%ebp)
     call    MessageBoxA
     addl    $16, %esp
     jmp     WINPROC_EXIT
 WINPROC_ELSE:
+    pushl   20(%ebp)
     pushl   16(%ebp)
     pushl   12(%ebp)
     pushl   8(%ebp)
-    pushl   4(%ebp)
     call    DefWindowProcA
     addl    $16, %esp
     jmp     WINPROC_EXIT
