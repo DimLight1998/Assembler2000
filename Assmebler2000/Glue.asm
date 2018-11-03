@@ -46,7 +46,7 @@ middleGlue proc uses esi edi ebx
 .code
 	; get length
 	getSectionLength textSection
-	invoke crt_printf, addr sectionLengthPrompt, eax ; demo
+	; invoke crt_printf, addr sectionLengthPrompt, eax ; demo
 
 	mov textLength, eax
 
@@ -64,19 +64,6 @@ middleGlue proc uses esi edi ebx
 	; set section's base address
 	invoke addBaseAddr, addr textSection, 401000h ; demo prevbug: use initSection and clear all labelTries info
 	invoke initSection, addr textSection, 401000h ; demo
-
-	mov esi, offset externTries
-	assume edi: ptr TrieNode
-	.while esi != currentExtern
-		mov edi, [esi]
-		invoke crt_printf, addr dllPrompt, addr [edi].nodeStr
-		mov edi, [edi].nodeVal
-		.while edi
-			invoke crt_printf, addr symbolPrompt, addr [edi].nodeStr
-			mov edi, [edi].nodeVal
-		.endw
-		add esi, type dword
-	.endw
 
 	; calculate base address of rdata
 	mov eax, numTextPage
@@ -295,7 +282,7 @@ middleGlue proc uses esi edi ebx
 	mov dataBase, eax
 
 	getSectionLength dataSection
-	invoke crt_printf, addr sectionLengthPrompt, eax ; demo
+	; invoke crt_printf, addr sectionLengthPrompt, eax ; demo
 
 	mov dataLength, eax
 
@@ -435,7 +422,6 @@ middleGlue endp
 	zero byte 0, 0, 0
 .code
 
-
 .data
 	cannotOpenOutput byte "cannot open output file: %s", 10, 0
 .code
@@ -448,7 +434,7 @@ afterGlue proc uses eax ebx ecx edx esi edi
 
     invoke CreateFile, addr outFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0
     mov fileHandle, eax
-	.if !fileHandle
+	.if fileHandle == INVALID_HANDLE_VALUE
 		invoke crt_printf, addr cannotOpenOutput, addr outFileName
 		ret
 	.endif
