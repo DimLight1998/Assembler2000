@@ -15,7 +15,12 @@ include SymbolDict.inc
 
 parseCommandLine proc uses esi
 	invoke GetCommandLine
+	assume eax: ptr byte
+	.while [eax] != 32 && [eax] ; space
+		inc eax
+	.endw
 	invoke crt_strcpy, addr lineBuffer, eax
+	assume eax: nothing
 	invoke tokenizeLine
 	mov esi, offset tokens
 	assume esi: ptr Token
