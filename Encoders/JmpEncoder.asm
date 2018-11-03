@@ -17,6 +17,7 @@ JmpRel proc uses eax ebx ecx edx esi edi,
     ; followed by immediateValue, immediatly
     mov eax, writeTo
     mov ebx, immediateValue
+    sub ebx, 5
     mov dword ptr [eax + 1], ebx
     mov eax, sizeOut
     mov dword ptr [eax], 5
