@@ -8,6 +8,8 @@ include SymbolDict.inc
 	outOpt byte ".o", 0
 	inFileNameNotAStr byte "Warning: input filename not a string, ignored", 10, 0
 	outFileNameNotAStr byte "Warning: output filename not a string, ignored", 10, 0
+	setInputFileName byte "setting input filename to %s", 10, 0
+	setOutputFileName byte "setting output filename to %s", 10, 0
 	unrecognizedOpt byte "unrecognized option: %s", 10, 0
 .code
 
@@ -24,6 +26,7 @@ parseCommandLine proc uses esi
 				invoke crt_printf, addr inFileNameNotAStr
 			.else
 				invoke crt_strcpy, addr inFileName, addr [esi + type Token].tokenStr
+				invoke crt_printf, addr setInputFileName, addr inFileName
 				add esi, type Token
 			.endif
 		.else
@@ -33,10 +36,11 @@ parseCommandLine proc uses esi
 					invoke crt_printf, addr outFileNameNotAStr
 				.else
 					invoke crt_strcpy, addr outFileName, addr [esi + type Token].tokenStr
+					invoke crt_printf, addr setOutputFileName, addr outFileName
 					add esi, type Token
 				.endif
 			.else
-				invoke crt_printf, addr unrecognizedOpt, addr [esi].tokenStr
+				; do nothing
 			.endif
 		.endif
 		add esi, type Token
