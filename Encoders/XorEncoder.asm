@@ -1,30 +1,27 @@
-.386
-.model flat, stdcall
-option casemap:none
-
-include EncoderUtils.inc
-
+include ../EncoderUtils.inc
 .code
-CmpMemReg proc uses eax ebx ecx edx esi edi,
+;OK
+XorMemReg proc uses eax ebx ecx edx esi edi,
     memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword,
     immediateValue: dword, sourceReg: dword, destinationReg: dword,
     writeTo: ptr byte, sizeOut: ptr byte
-    local mrr: byte
 
+    local mrr: byte
     ; opcode
-    mov byte ptr [writeTo], 039h
+    mov eax, writeTo
+    mov byte ptr [eax], 031h
 
     ; get mrr and sib, mrr is for 'MOD-REG-R/M'
     mov mrr, 0
     ; set up REG
     invoke RegInMemRegRmValue, sourceReg
     add mrr, al
-    
+
     invoke EncodeMrrSib, memBaseReg, memScale, memIndexReg
     add mrr, al
     mov eax, writeTo
-	mov bl, mrr
-    mov byte ptr [eax + 1], bl
+	mov dl, mrr
+    mov byte ptr [eax + 1], dl
     .if cl == 0
         mov edx, 2
     .elseif cl == 1
@@ -38,29 +35,32 @@ CmpMemReg proc uses eax ebx ecx edx esi edi,
     mov ecx, memDisplacement
     mov dword ptr [eax + edx], ecx
     add edx, 4
-    mov [sizeOut], edx
+    mov eax, sizeOut
+    mov dword ptr [eax], edx
 
     ret
-CmpMemReg endp
+XorMemReg endp
 
 
-CmpRegReg proc uses eax ebx ecx edx esi edi,
+XorRegReg proc uses eax ebx ecx edx esi edi,
     memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword,
     immediateValue: dword, sourceReg: dword, destinationReg: dword,
     writeTo: ptr byte, sizeOut: ptr byte
 
+    local mrr: byte
+    local sib: byte
+
     ; size of the code will be stored in ebx
 
     ; get opcode
-    local mrr: byte
-    local sib: byte
-    ; write opcode
-    mov byte ptr [writeTo], 03Bh
+    mov eax, writeTo
+    mov byte ptr [eax], 033h
 
     ; get mrr and sib, mrr is for 'MOD-REG-R/M'
     mov mrr, 0
     mov sib, 0
     ; set up REG
+    ; opcode = 033h, Reg = destination
     invoke RegInMemRegRmValue, destinationReg
     add mrr, al
     ; MOD = 11, R/M = sourceReg
@@ -69,23 +69,28 @@ CmpRegReg proc uses eax ebx ecx edx esi edi,
     add mrr, cl
     ; write mrr
 	mov bl, mrr
-    mov byte ptr [writeTo + 1], bl
+    mov eax, writeTo
+    mov byte ptr [eax + 1], bl
     
     ; this operation always has only 2 bytes
-    mov [sizeOut], 2
+    mov eax, sizeOut
+    mov dword ptr [eax], 2
 
     ret
-CmpRegReg endp
+XorRegReg endp
 
 
-CmpRegMem proc uses eax ebx ecx edx esi edi,
+XorRegMem proc uses eax ebx ecx edx esi edi,
     memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword,
     immediateValue: dword, sourceReg: dword, destinationReg: dword,
     writeTo: ptr byte, sizeOut: ptr byte
+
     local mrr: byte
 
+
     ; opcode
-    mov byte ptr [writeTo], 03Bh
+    mov eax, writeTo
+    mov byte ptr [eax], 033h
 
     ; get mrr and sib, mrr is for 'MOD-REG-R/M'
     mov mrr, 0
@@ -96,8 +101,8 @@ CmpRegMem proc uses eax ebx ecx edx esi edi,
     invoke EncodeMrrSib, memBaseReg, memScale, memIndexReg
     add mrr, al
     mov eax, writeTo
-	mov bl, mrr
-    mov byte ptr [eax + 1], bl
+	mov dl, mrr
+    mov byte ptr [eax + 1], dl
     .if cl == 0
         mov edx, 2
     .elseif cl == 1
@@ -111,72 +116,75 @@ CmpRegMem proc uses eax ebx ecx edx esi edi,
     mov ecx, memDisplacement
     mov dword ptr [eax + edx], ecx
     add edx, 4
-    mov [sizeOut], edx
+    mov eax, sizeOut
+    mov dword ptr [eax], edx
 
     ret
-CmpRegMem endp
+XorRegMem endp
 
 
-CmpRegImm proc uses eax ebx ecx edx esi edi,
+XorRegImm proc uses eax ebx ecx edx esi edi,
     memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword,
     immediateValue: dword, sourceReg: dword, destinationReg: dword,
     writeTo: ptr byte, sizeOut: ptr byte
 
-    ; size of the code will be stored in ebx
-
-    ; get opcode
+    local opcode: byte
     local mrr: byte
 
-
+    ; size of the code will be stored in ebx
+    ; get opcode
     ; always use 81 for simplicity
-
-    ; write opcode
-    mov byte ptr [writeTo], 081h
+    mov eax, writeTo
+    mov byte ptr [eax], 081h
 
     ; get mrr, mrr is for 'MOD-REG-R/M'
     mov mrr, 0
 
-    ; MOD = 11, REG = 111, R/M = destinationReg
+    ; MOD = 11, REG = 110, R/M = destinationReg
     add mrr, 192
-    add mrr, 56
-	mov eax, destinationReg
-    add mrr, al
-	mov al, mrr
-    mov byte ptr [writeTo + 1], al
+    add mrr, 48
+	mov ebx, destinationReg
+    add mrr, bl
+	mov cl, mrr
+	mov ebx, writeTo
+    mov byte ptr [ebx + 1], cl
     mov ebx, 2
 
     ; set up constant
     mov ecx, immediateValue
-    mov dword ptr [writeTo + ebx], ecx
+    mov eax, writeTo
+    mov dword ptr [eax + ebx], ecx
 
     add ebx, 4
-    mov [sizeOut], ebx
+    mov eax, sizeOut
+    mov dword ptr [eax], ebx
 
-    
     ret
-CmpRegImm endp
+XorRegImm endp
 
 
-CmpMemImm proc uses eax ebx ecx edx esi edi,
+XorMemImm proc uses eax ebx ecx edx esi edi,
     memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword,
     immediateValue: dword, sourceReg: dword, destinationReg: dword,
     writeTo: ptr byte, sizeOut: ptr byte
+
     local mrr: byte
 
     ; opcode
-    mov byte ptr [writeTo], 081h
+    mov eax, writeTo
+    mov byte ptr [eax], 81h
 
     ; get mrr and sib, mrr is for 'MOD-REG-R/M'
     mov mrr, 0
     ; set up REG
-    ; REG = 111
-    add mrr, 56
+    ; REG = 110
+    add mrr, 48
     
     invoke EncodeMrrSib, memBaseReg, memScale, memIndexReg
     add mrr, al
     mov eax, writeTo
-	mov bl, mrr
-    mov byte ptr [eax + 1], bl
+	mov dl, mrr
+    mov byte ptr [eax + 1], dl
     .if cl == 0
         mov edx, 2
     .elseif cl == 1
@@ -195,8 +203,10 @@ CmpMemImm proc uses eax ebx ecx edx esi edi,
     mov ecx, immediateValue
     mov dword ptr [eax + edx], ecx
     add edx, 4
-    mov [sizeOut], edx
+
+    mov eax, sizeOut
+    mov dword ptr [eax], edx
     
     ret
-CmpMemImm endp
+XorMemImm endp
 end

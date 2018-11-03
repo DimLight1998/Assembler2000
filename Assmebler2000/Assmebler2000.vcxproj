@@ -71,9 +71,9 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>G:\masm32\include</IncludePath>
-    <ReferencePath>G:\masm32\include</ReferencePath>
-    <LibraryPath>G:\masm32\lib</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <ReferencePath>$(VC_ReferencesPath_x86);</ReferencePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>G:\masm32\include</IncludePath>
@@ -106,6 +106,7 @@
       <AdditionalLibraryDirectories>G:\masm32\lib</AdditionalLibraryDirectories>
       <EntryPointSymbol>
       </EntryPointSymbol>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -165,24 +166,24 @@
     </MASM>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <MASM Include="..\AddEncoder.asm" />
-    <MASM Include="..\AndEncoder.asm" />
-    <MASM Include="..\CallEncoder.asm" />
-    <MASM Include="..\CmpEncoder.asm" />
-    <MASM Include="..\DecEncoder.asm" />
+    <MASM Include="..\Encoders\AddEncoder.asm" />
+    <MASM Include="..\Encoders\AndEncoder.asm" />
+    <MASM Include="..\Encoders\CallEncoder.asm" />
+    <MASM Include="..\Encoders\CmpEncoder.asm" />
+    <MASM Include="..\Encoders\DecEncoder.asm" />
+    <MASM Include="..\Encoders\IncEncoder.asm" />
+    <MASM Include="..\Encoders\LeaEncoder.asm" />
+    <MASM Include="..\Encoders\MovEncoder.asm" />
+    <MASM Include="..\Encoders\NegEncoder.asm" />
+    <MASM Include="..\Encoders\NotEncoder.asm" />
+    <MASM Include="..\Encoders\OrEncoder.asm" />
+    <MASM Include="..\Encoders\PopEncoder.asm" />
+    <MASM Include="..\Encoders\PushEncoder.asm" />
+    <MASM Include="..\Encoders\RetnEncoder.asm" />
+    <MASM Include="..\Encoders\SubEncoder.asm" />
+    <MASM Include="..\Encoders\TestEncoder.asm" />
+    <MASM Include="..\Encoders\XorEncoder.asm" />
     <MASM Include="..\EncoderUtils.asm" />
-    <MASM Include="..\IncEncoder.asm" />
-    <MASM Include="..\LeaEncoder.asm" />
-    <MASM Include="..\MovEncoder.asm" />
-    <MASM Include="..\NegEncoder.asm" />
-    <MASM Include="..\NotEncoder.asm" />
-    <MASM Include="..\OrEncoder.asm" />
-    <MASM Include="..\PopEncoder.asm" />
-    <MASM Include="..\PushEncoder.asm" />
-    <MASM Include="..\RetnEncoder.asm" />
-    <MASM Include="..\SubEncoder.asm" />
-    <MASM Include="..\TestEncoder.asm" />
-    <MASM Include="..\XorEncoder.asm" />
     <MASM Include="Expression.asm" />
     <MASM Include="Glue.asm" />
     <MASM Include="LineControl.asm" />

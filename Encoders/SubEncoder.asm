@@ -1,30 +1,41 @@
-.386
-.model flat, stdcall
-option casemap:none
-
-include EncoderUtils.inc
+include ../EncoderUtils.inc
+.code
 
 SubRegImm proc uses eax ebx ecx edx esi edi,
     memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword,
     immediateValue: dword, sourceReg: dword, destinationReg: dword,
     writeTo: ptr byte, sizeOut: ptr byte
+    local opcode: byte
+    local mrr: byte
 
-    mov [writeTo], 081h
+    ; size of the code will be stored in ebx
+    ; get opcode
+    ; always use 81 for simplicity
+    mov eax, writeTo
+    mov byte ptr [eax], 081h
+
+    ; get mrr, mrr is for 'MOD-REG-R/M'
+    mov mrr, 0
 
     ; MOD = 11, REG = 101, R/M = destinationReg
-    local mrr: byte
-    mov mrr, 192 + 40
-    add mrr, destinationReg
-    mov [writeTo + 1], mrr
+    add mrr, 192
+    add mrr, 40
+	mov ebx, destinationReg
+    add mrr, bl
+	mov cl, mrr
+	mov ebx, writeTo
+    mov byte ptr [ebx + 1], cl
     mov ebx, 2
 
     ; set up constant
     mov ecx, immediateValue
-    mov dword ptr [writeTo + ebx], ecx
+    mov eax, writeTo
+    mov dword ptr [eax + ebx], ecx
 
     add ebx, 4
-    mov [sizeOut], ebx
-    
+    mov eax, sizeOut
+    mov dword ptr [eax], ebx
+
     ret
 SubRegImm endp
 
@@ -33,12 +44,13 @@ SubMemImm proc uses eax ebx ecx edx esi edi,
     memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword,
     immediateValue: dword, sourceReg: dword, destinationReg: dword,
     writeTo: ptr byte, sizeOut: ptr byte
+    local mrr: byte
 
     ; opcode
-    mov [writeTo], 081h
+    mov eax, writeTo
+    mov byte ptr [eax], 81h
 
     ; get mrr and sib, mrr is for 'MOD-REG-R/M'
-    local mrr: byte
     mov mrr, 0
     ; set up REG
     ; REG = 101
@@ -47,11 +59,12 @@ SubMemImm proc uses eax ebx ecx edx esi edi,
     invoke EncodeMrrSib, memBaseReg, memScale, memIndexReg
     add mrr, al
     mov eax, writeTo
-    mov [eax + 1], mrr
+	mov dl, mrr
+    mov byte ptr [eax + 1], dl
     .if cl == 0
         mov edx, 2
     .elseif cl == 1
-        mov [eax + 2], bl
+        mov byte ptr [eax + 2], bl
         mov edx, 3
     .else
         invoke ExitProcess, 1
@@ -66,34 +79,39 @@ SubMemImm proc uses eax ebx ecx edx esi edi,
     mov ecx, immediateValue
     mov dword ptr [eax + edx], ecx
     add edx, 4
-    mov [sizeOut], edx
+
+    mov eax, sizeOut
+    mov dword ptr [eax], edx
     
     ret
 SubMemImm endp
 
+;OK
 SubMemReg proc uses eax ebx ecx edx esi edi,
     memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword,
     immediateValue: dword, sourceReg: dword, destinationReg: dword,
     writeTo: ptr byte, sizeOut: ptr byte
 
+    local mrr: byte
     ; opcode
-    mov [writeTo], 029h
+    mov eax, writeTo
+    mov byte ptr [eax], 029h
 
     ; get mrr and sib, mrr is for 'MOD-REG-R/M'
-    local mrr: byte
     mov mrr, 0
     ; set up REG
     invoke RegInMemRegRmValue, sourceReg
     add mrr, al
-    
+
     invoke EncodeMrrSib, memBaseReg, memScale, memIndexReg
     add mrr, al
     mov eax, writeTo
-    mov [eax + 1], mrr
+	mov dl, mrr
+    mov byte ptr [eax + 1], dl
     .if cl == 0
         mov edx, 2
     .elseif cl == 1
-        mov [eax + 2], bl
+        mov byte ptr [eax + 2], bl
         mov edx, 3
     .else
         invoke ExitProcess, 1
@@ -103,8 +121,8 @@ SubMemReg proc uses eax ebx ecx edx esi edi,
     mov ecx, memDisplacement
     mov dword ptr [eax + edx], ecx
     add edx, 4
-    mov [sizeOut], edx
-
+    mov eax, sizeOut
+    mov dword ptr [eax], edx
     ret
 SubMemReg endp
 
@@ -114,32 +132,34 @@ SubRegReg proc uses eax ebx ecx edx esi edi,
     immediateValue: dword, sourceReg: dword, destinationReg: dword,
     writeTo: ptr byte, sizeOut: ptr byte
 
+    local mrr: byte
+    local sib: byte
+
     ; size of the code will be stored in ebx
 
     ; get opcode
-    local opcode: byte
-    mov opcode, 02Bh
-    ; write opcode
-    mov [writeTo], opcode
+    mov eax, writeTo
+    mov byte ptr [eax], 02Bh
 
     ; get mrr and sib, mrr is for 'MOD-REG-R/M'
-    local mrr: byte
     mov mrr, 0
-    local sib: byte
     mov sib, 0
     ; set up REG
-    ; opcode = 03h, Reg = destination
+    ; opcode = 02Bh, Reg = destination
     invoke RegInMemRegRmValue, destinationReg
     add mrr, al
     ; MOD = 11, R/M = sourceReg
     add mrr, 192
     mov ecx, sourceReg
-    add mrr, ecx
+    add mrr, cl
     ; write mrr
-    mov [writeTo + 1], mrr
+	mov bl, mrr
+    mov eax, writeTo
+    mov byte ptr [eax + 1], bl
     
     ; this operation always has only 2 bytes
-    mov [sizeOut], 2
+    mov eax, sizeOut
+    mov dword ptr [eax], 2
 
     ret
 SubRegReg endp
@@ -150,11 +170,14 @@ SubRegMem proc uses eax ebx ecx edx esi edi,
     immediateValue: dword, sourceReg: dword, destinationReg: dword,
     writeTo: ptr byte, sizeOut: ptr byte
 
+    local mrr: byte
+
+
     ; opcode
-    mov [writeTo], 02Bh
+    mov eax, writeTo
+    mov byte ptr [eax], 02Bh
 
     ; get mrr and sib, mrr is for 'MOD-REG-R/M'
-    local mrr: byte
     mov mrr, 0
     ; set up REG
     invoke RegInMemRegRmValue, destinationReg
@@ -163,11 +186,12 @@ SubRegMem proc uses eax ebx ecx edx esi edi,
     invoke EncodeMrrSib, memBaseReg, memScale, memIndexReg
     add mrr, al
     mov eax, writeTo
-    mov [eax + 1], mrr
+	mov dl, mrr
+    mov byte ptr [eax + 1], dl
     .if cl == 0
         mov edx, 2
     .elseif cl == 1
-        mov [eax + 2], bl
+        mov byte ptr [eax + 2], bl
         mov edx, 3
     .else
         invoke ExitProcess, 1
@@ -177,7 +201,10 @@ SubRegMem proc uses eax ebx ecx edx esi edi,
     mov ecx, memDisplacement
     mov dword ptr [eax + edx], ecx
     add edx, 4
-    mov [sizeOut], edx
+    mov eax, sizeOut
+    mov dword ptr [eax], edx
 
     ret
 SubRegMem endp
+
+end

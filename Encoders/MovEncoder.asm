@@ -1,33 +1,32 @@
-.386
-.model flat, stdcall
-option casemap:none
+include ../EncoderUtils.inc
 
-include EncoderUtils.inc
-
-
-XorMemReg proc uses eax ebx ecx edx esi edi,
+.code
+;OK
+MovMemReg proc uses eax ebx ecx edx esi edi,
     memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword,
     immediateValue: dword, sourceReg: dword, destinationReg: dword,
     writeTo: ptr byte, sizeOut: ptr byte
 
+    local mrr: byte
     ; opcode
-    mov [writeTo], 31h
+    mov eax, writeTo
+    mov byte ptr [eax], 089h
 
     ; get mrr and sib, mrr is for 'MOD-REG-R/M'
-    local mrr: byte
     mov mrr, 0
     ; set up REG
     invoke RegInMemRegRmValue, sourceReg
     add mrr, al
-    
+
     invoke EncodeMrrSib, memBaseReg, memScale, memIndexReg
     add mrr, al
     mov eax, writeTo
-    mov [eax + 1], mrr
+	mov dl, mrr
+    mov byte ptr [eax + 1], dl
     .if cl == 0
         mov edx, 2
     .elseif cl == 1
-        mov [eax + 2], bl
+        mov byte ptr [eax + 2], bl
         mov edx, 3
     .else
         invoke ExitProcess, 1
@@ -37,58 +36,63 @@ XorMemReg proc uses eax ebx ecx edx esi edi,
     mov ecx, memDisplacement
     mov dword ptr [eax + edx], ecx
     add edx, 4
-    mov [sizeOut], edx
+    mov eax, sizeOut
+    mov dword ptr [eax], edx
 
     ret
-XorMemReg endp
+MovMemReg endp
 
 
-XorRegReg proc uses eax ebx ecx edx esi edi,
+MovRegReg proc uses eax ebx ecx edx esi edi,
     memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword,
     immediateValue: dword, sourceReg: dword, destinationReg: dword,
     writeTo: ptr byte, sizeOut: ptr byte
+    local mrr: byte
+    local sib: byte
 
     ; size of the code will be stored in ebx
 
     ; get opcode
-    local opcode: byte
-    mov opcode, 33h
-    ; write opcode
-    mov [writeTo], opcode
+    mov eax, writeTo
+    mov byte ptr [eax], 08Bh
 
     ; get mrr and sib, mrr is for 'MOD-REG-R/M'
-    local mrr: byte
     mov mrr, 0
-    local sib: byte
     mov sib, 0
     ; set up REG
-    ; opcode = 33h, Reg = destination
+    ; opcode = 08Bh, Reg = destination
     invoke RegInMemRegRmValue, destinationReg
     add mrr, al
     ; MOD = 11, R/M = sourceReg
     add mrr, 192
     mov ecx, sourceReg
-    add mrr, ecx
+    add mrr, cl
     ; write mrr
-    mov [writeTo + 1], mrr
+	mov bl, mrr
+    mov eax, writeTo
+    mov byte ptr [eax + 1], bl
     
     ; this operation always has only 2 bytes
-    mov [sizeOut], 2
+    mov eax, sizeOut
+    mov dword ptr [eax], 2
 
     ret
-XorRegReg endp
+MovRegReg endp
 
 
-XorRegMem proc uses eax ebx ecx edx esi edi,
+MovRegMem proc uses eax ebx ecx edx esi edi,
     memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword,
     immediateValue: dword, sourceReg: dword, destinationReg: dword,
     writeTo: ptr byte, sizeOut: ptr byte
 
+    local mrr: byte
+
+
     ; opcode
-    mov [writeTo], 33h
+    mov eax, writeTo
+    mov byte ptr [eax], 08Bh
 
     ; get mrr and sib, mrr is for 'MOD-REG-R/M'
-    local mrr: byte
     mov mrr, 0
     ; set up REG
     invoke RegInMemRegRmValue, destinationReg
@@ -97,11 +101,12 @@ XorRegMem proc uses eax ebx ecx edx esi edi,
     invoke EncodeMrrSib, memBaseReg, memScale, memIndexReg
     add mrr, al
     mov eax, writeTo
-    mov [eax + 1], mrr
+	mov dl, mrr
+    mov byte ptr [eax + 1], dl
     .if cl == 0
         mov edx, 2
     .elseif cl == 1
-        mov [eax + 2], bl
+        mov byte ptr [eax + 2], bl
         mov edx, 3
     .else
         invoke ExitProcess, 1
@@ -111,74 +116,79 @@ XorRegMem proc uses eax ebx ecx edx esi edi,
     mov ecx, memDisplacement
     mov dword ptr [eax + edx], ecx
     add edx, 4
-    mov [sizeOut], edx
+    mov eax, sizeOut
+    mov dword ptr [eax], edx
 
     ret
-XorRegMem endp
+MovRegMem endp
 
 
-XorRegImm proc uses eax ebx ecx edx esi edi,
+MovRegImm proc uses eax ebx ecx edx esi edi,
     memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword,
     immediateValue: dword, sourceReg: dword, destinationReg: dword,
     writeTo: ptr byte, sizeOut: ptr byte
 
-    ; size of the code will be stored in ebx
-
-    ; get opcode
     local opcode: byte
+    local mrr: byte
 
+    ; size of the code will be stored in ebx
+    ; get opcode
     ; always use 81 for simplicity
-    mov opcode, 081h
-
-    ; write opcode
-    mov [writeTo], opcode
+    mov eax, writeTo
+    mov byte ptr [eax], 0C7h
 
     ; get mrr, mrr is for 'MOD-REG-R/M'
-    local mrr: byte
     mov mrr, 0
 
-    ; MOD = 11, REG = 110, R/M = destinationReg
+    ; MOD = 11, REG = 000, R/M = destinationReg
     add mrr, 192
-    add mrr, 48
-    add mrr, destinationReg
-    mov [writeTo + 1], mrr
+    add mrr, 0
+	mov ebx, destinationReg
+    add mrr, bl
+	mov cl, mrr
+	mov ebx, writeTo
+    mov byte ptr [ebx + 1], cl
     mov ebx, 2
 
     ; set up constant
     mov ecx, immediateValue
-    mov dword ptr [writeTo + ebx], ecx
+    mov eax, writeTo
+    mov dword ptr [eax + ebx], ecx
 
     add ebx, 4
-    mov [sizeOut], ebx
+    mov eax, sizeOut
+    mov dword ptr [eax], ebx
 
-    
     ret
-XorRegImm endp
+MovRegImm endp
 
 
-XorMemImm proc uses eax ebx ecx edx esi edi,
+MovMemImm proc uses eax ebx ecx edx esi edi,
     memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword,
     immediateValue: dword, sourceReg: dword, destinationReg: dword,
     writeTo: ptr byte, sizeOut: ptr byte
 
+    local mrr: byte
+
     ; opcode
-    mov [writeTo], 081h
+    mov eax, writeTo
+    mov byte ptr [eax], 0C7h
 
     ; get mrr and sib, mrr is for 'MOD-REG-R/M'
-    local mrr: byte
     mov mrr, 0
     ; set up REG
-    ; REG = 110
-    add mrr, 48
+    ; REG = 000
+    add mrr, 0
     
     invoke EncodeMrrSib, memBaseReg, memScale, memIndexReg
     add mrr, al
     mov eax, writeTo
-    mov [eax + 1], mrr
+	mov dl, mrr
+    mov byte ptr [eax + 1], dl
     .if cl == 0
         mov edx, 2
     .elseif cl == 1
-        mov [eax + 2], bl
+        mov byte ptr [eax + 2], bl
         mov edx, 3
     .else
         invoke ExitProcess, 1
@@ -193,7 +203,10 @@ XorMemImm proc uses eax ebx ecx edx esi edi,
     mov ecx, immediateValue
     mov dword ptr [eax + edx], ecx
     add edx, 4
-    mov [sizeOut], edx
+
+    mov eax, sizeOut
+    mov dword ptr [eax], edx
     
     ret
-XorMemImm endp
+MovMemImm endp
+end

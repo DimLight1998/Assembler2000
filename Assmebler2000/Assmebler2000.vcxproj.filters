@@ -39,58 +39,58 @@
     <MASM Include="Operands.asm">
       <Filter>源文件</Filter>
     </MASM>
-    <MASM Include="..\AddEncoder.asm">
-      <Filter>源文件</Filter>
-    </MASM>
-    <MASM Include="..\AndEncoder.asm">
-      <Filter>源文件</Filter>
-    </MASM>
-    <MASM Include="..\CallEncoder.asm">
-      <Filter>源文件</Filter>
-    </MASM>
-    <MASM Include="..\CmpEncoder.asm">
-      <Filter>源文件</Filter>
-    </MASM>
-    <MASM Include="..\DecEncoder.asm">
-      <Filter>源文件</Filter>
-    </MASM>
     <MASM Include="..\EncoderUtils.asm">
       <Filter>源文件</Filter>
     </MASM>
-    <MASM Include="..\IncEncoder.asm">
+    <MASM Include="..\Encoders\AddEncoder.asm">
       <Filter>源文件</Filter>
     </MASM>
-    <MASM Include="..\LeaEncoder.asm">
+    <MASM Include="..\Encoders\AndEncoder.asm">
       <Filter>源文件</Filter>
     </MASM>
-    <MASM Include="..\MovEncoder.asm">
+    <MASM Include="..\Encoders\CallEncoder.asm">
       <Filter>源文件</Filter>
     </MASM>
-    <MASM Include="..\NegEncoder.asm">
+    <MASM Include="..\Encoders\CmpEncoder.asm">
       <Filter>源文件</Filter>
     </MASM>
-    <MASM Include="..\NotEncoder.asm">
+    <MASM Include="..\Encoders\DecEncoder.asm">
       <Filter>源文件</Filter>
     </MASM>
-    <MASM Include="..\OrEncoder.asm">
+    <MASM Include="..\Encoders\IncEncoder.asm">
       <Filter>源文件</Filter>
     </MASM>
-    <MASM Include="..\PopEncoder.asm">
+    <MASM Include="..\Encoders\LeaEncoder.asm">
       <Filter>源文件</Filter>
     </MASM>
-    <MASM Include="..\PushEncoder.asm">
+    <MASM Include="..\Encoders\MovEncoder.asm">
       <Filter>源文件</Filter>
     </MASM>
-    <MASM Include="..\RetnEncoder.asm">
+    <MASM Include="..\Encoders\NegEncoder.asm">
       <Filter>源文件</Filter>
     </MASM>
-    <MASM Include="..\SubEncoder.asm">
+    <MASM Include="..\Encoders\NotEncoder.asm">
       <Filter>源文件</Filter>
     </MASM>
-    <MASM Include="..\TestEncoder.asm">
+    <MASM Include="..\Encoders\OrEncoder.asm">
       <Filter>源文件</Filter>
     </MASM>
-    <MASM Include="..\XorEncoder.asm">
+    <MASM Include="..\Encoders\PopEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\Encoders\PushEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\Encoders\RetnEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\Encoders\SubEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\Encoders\TestEncoder.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="..\Encoders\XorEncoder.asm">
       <Filter>源文件</Filter>
     </MASM>
   </ItemGroup>

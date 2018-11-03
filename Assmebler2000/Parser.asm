@@ -419,131 +419,133 @@ encodeInstruction proc uses edi ebx, instruction: dword, strAddr: ptr byte
 	assume edi: ptr Operand
 	; add
 	.if instruction == INSADDL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_MEM
-		invoke AddMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].baseReg, -1, startAddr, sizeOut
+		invoke AddMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSADDL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_REG
-		invoke AddRegReg, -1, 1, -1, 0, 0, [edi + typeOperand].baseReg, [edi].baseReg, startAddr, sizeOut
+		invoke AddRegReg, -1, 1, -1, 0, 0, [edi + type Operand].baseReg, [edi].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSADDL && opCount == 2 && [edi].operandType == OPER_MEM && [edi + type Operand].operandType == OPER_REG
-		invoke AddRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, sizeOut
+		invoke AddRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSADDL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_REG
-		invoke AddRegImm, -1, 1, -1, 0, [edi].displacement, -1, [edi + type Operand].baseReg, startAddr, sizeOut
+		invoke AddRegImm, -1, 1, -1, 0, [edi].displacement, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSADDL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_MEM
-		invoke AddMemImm, [edi + type Operand].baseReg, [edi + type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].displacement, -1, -1, startAddr, sizeOut
+		invoke AddMemImm, [edi + type Operand].baseReg, [edi + type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].displacement, -1, -1, startAddr, addr sizeOut
 	; and
 	.elseif instruction == INSANDL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_MEM
-		invoke AndMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].baseReg, -1, startAddr, sizeOut
+		invoke AndMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSANDL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_REG
-		invoke AndRegReg, -1, 1, -1, 0, 0, [edi + typeOperand].baseReg, [edi].baseReg, startAddr, sizeOut
+		invoke AndRegReg, -1, 1, -1, 0, 0, [edi + type Operand].baseReg, [edi].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSANDL && opCount == 2 && [edi].operandType == OPER_MEM && [edi + type Operand].operandType == OPER_REG
-		invoke AndRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, sizeOut
+		invoke AndRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSANDL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_REG
-		invoke AndRegImm, -1, 1, -1, 0, [edi].displacement, -1, [edi + type Operand].baseReg, startAddr, sizeOut
+		invoke AndRegImm, -1, 1, -1, 0, [edi].displacement, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSANDL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_MEM
-		invoke AndMemImm, [edi + type Operand].baseReg, [edi + type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].displacement, -1, -1, startAddr, sizeOut
+		invoke AndMemImm, [edi + type Operand].baseReg, [edi + type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].displacement, -1, -1, startAddr, addr sizeOut
 	; cmp
 	.elseif instruction == INSCMPL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_MEM
-		invoke CmpMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].baseReg, -1, startAddr, sizeOut
+		invoke CmpMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSCMPL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_REG
-		invoke CmpRegReg, -1, 1, -1, 0, 0, [edi + typeOperand].baseReg, [edi].baseReg, startAddr, sizeOut
+		invoke CmpRegReg, -1, 1, -1, 0, 0, [edi + type Operand].baseReg, [edi].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSCMPL && opCount == 2 && [edi].operandType == OPER_MEM && [edi + type Operand].operandType == OPER_REG
-		invoke CmpRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, sizeOut
+		invoke CmpRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSCMPL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_REG
-		invoke CmpRegImm, -1, 1, -1, 0, [edi].displacement, -1, [edi + type Operand].baseReg, startAddr, sizeOut
+		invoke CmpRegImm, -1, 1, -1, 0, [edi].displacement, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSCMPL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_MEM
-		invoke CmpMemImm, [edi + type Operand].baseReg, [edi + type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].displacement, -1, -1, startAddr, sizeOut
+		invoke CmpMemImm, [edi + type Operand].baseReg, [edi + type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].displacement, -1, -1, startAddr, addr sizeOut
 	; mov
 	.elseif instruction == INSMOVL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_MEM
-		invoke MovMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].baseReg, -1, startAddr, sizeOut
+		invoke MovMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSMOVL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_REG
-		invoke MovRegReg, -1, 1, -1, 0, 0, [edi + typeOperand].baseReg, [edi].baseReg, startAddr, sizeOut
+		invoke MovRegReg, -1, 1, -1, 0, 0, [edi + type Operand].baseReg, [edi].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSMOVL && opCount == 2 && [edi].operandType == OPER_MEM && [edi + type Operand].operandType == OPER_REG
-		invoke MovRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, sizeOut
+		invoke MovRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSMOVL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_REG
-		invoke MovRegImm, -1, 1, -1, 0, [edi].displacement, -1, [edi + type Operand].baseReg, startAddr, sizeOut
+		invoke MovRegImm, -1, 1, -1, 0, [edi].displacement, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSMOVL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_MEM
-		invoke MovMemImm, [edi + type Operand].baseReg, [edi + type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].displacement, -1, -1, startAddr, sizeOut
+		invoke MovMemImm, [edi + type Operand].baseReg, [edi + type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].displacement, -1, -1, startAddr, addr sizeOut
 	; or
 	.elseif instruction == INSORL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_MEM
-		invoke OrMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].baseReg, -1, startAddr, sizeOut
+		invoke OrMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSORL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_REG
-		invoke OrRegReg, -1, 1, -1, 0, 0, [edi + typeOperand].baseReg, [edi].baseReg, startAddr, sizeOut
+		invoke OrRegReg, -1, 1, -1, 0, 0, [edi + type Operand].baseReg, [edi].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSORL && opCount == 2 && [edi].operandType == OPER_MEM && [edi + type Operand].operandType == OPER_REG
-		invoke OrRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, sizeOut
+		invoke OrRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSORL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_REG
-		invoke OrRegImm, -1, 1, -1, 0, [edi].displacement, -1, [edi + type Operand].baseReg, startAddr, sizeOut
+		invoke OrRegImm, -1, 1, -1, 0, [edi].displacement, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSORL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_MEM
-		invoke OrMemImm, [edi + type Operand].baseReg, [edi + type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].displacement, -1, -1, startAddr, sizeOut
+		invoke OrMemImm, [edi + type Operand].baseReg, [edi + type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].displacement, -1, -1, startAddr, addr sizeOut
 	; sub
 	.elseif instruction == INSSUBL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_MEM
-		invoke SubMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].baseReg, -1, startAddr, sizeOut
+		invoke SubMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSSUBL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_REG
-		invoke SubRegReg, -1, 1, -1, 0, 0, [edi + typeOperand].baseReg, [edi].baseReg, startAddr, sizeOut
+		invoke SubRegReg, -1, 1, -1, 0, 0, [edi + type Operand].baseReg, [edi].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSSUBL && opCount == 2 && [edi].operandType == OPER_MEM && [edi + type Operand].operandType == OPER_REG
-		invoke SubRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, sizeOut
+		invoke SubRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSSUBL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_REG
-		invoke SubRegImm, -1, 1, -1, 0, [edi].displacement, -1, [edi + type Operand].baseReg, startAddr, sizeOut
+		invoke SubRegImm, -1, 1, -1, 0, [edi].displacement, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSSUBL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_MEM
-		invoke SubMemImm, [edi + type Operand].baseReg, [edi + type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].displacement, -1, -1, startAddr, sizeOut
+		invoke SubMemImm, [edi + type Operand].baseReg, [edi + type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].displacement, -1, -1, startAddr, addr sizeOut
 	; xor
 	.elseif instruction == INSXORL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_MEM
-		invoke XorMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].baseReg, -1, startAddr, sizeOut
+		invoke XorMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSXORL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_REG
-		invoke XorRegReg, -1, 1, -1, 0, 0, [edi + typeOperand].baseReg, [edi].baseReg, startAddr, sizeOut
+		invoke XorRegReg, -1, 1, -1, 0, 0, [edi + type Operand].baseReg, [edi].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSXORL && opCount == 2 && [edi].operandType == OPER_MEM && [edi + type Operand].operandType == OPER_REG
-		invoke XorRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, sizeOut
+		invoke XorRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSXORL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_REG
-		invoke XorRegImm, -1, 1, -1, 0, [edi].displacement, -1, [edi + type Operand].baseReg, startAddr, sizeOut
+		invoke XorRegImm, -1, 1, -1, 0, [edi].displacement, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSXORL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_MEM
-		invoke XorMemImm, [edi + type Operand].baseReg, [edi + type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].displacement, -1, -1, startAddr, sizeOut
+		invoke XorMemImm, [edi + type Operand].baseReg, [edi + type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].displacement, -1, -1, startAddr, addr sizeOut
 	; test
 	.elseif instruction == INSTESTL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_MEM
-		invoke TestMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].baseReg, -1, startAddr, sizeOut
+		invoke TestMemReg, [edi + type Operand].baseReg, [edi+type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSTESTL && opCount == 2 && [edi].operandType == OPER_REG && [edi + type Operand].operandType == OPER_REG
-		invoke TestRegReg, -1, 1, -1, 0, 0, [edi + typeOperand].baseReg, [edi].baseReg, startAddr, sizeOut
+		invoke TestRegReg, -1, 1, -1, 0, 0, [edi + type Operand].baseReg, [edi].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSTESTL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_REG
-		invoke TestRegImm, -1, 1, -1, 0, [edi].displacement, -1, [edi + type Operand].baseReg, startAddr, sizeOut
+		invoke TestRegImm, -1, 1, -1, 0, [edi].displacement, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSTESTL && opCount == 2 && [edi].operandType == OPER_IMM && [edi + type Operand].operandType == OPER_MEM
-		invoke TestMemImm, [edi + type Operand].baseReg, [edi + type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].displacement, -1, -1, startAddr, sizeOut
+		invoke TestMemImm, [edi + type Operand].baseReg, [edi + type Operand].scale, [edi + type Operand].indexReg, [edi + type Operand].displacement, [edi].displacement, -1, -1, startAddr, addr sizeOut
 	; lea
 	.elseif instruction == INSLEAL && opCount == 2 && [edi].operandType == OPER_MEM && [edi + type Operand].operandType == OPER_REG
-		invoke LeaRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, sizeOut
+		invoke LeaRegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, [edi + type Operand].baseReg, startAddr, addr sizeOut
 	; dec
 	.elseif instruction == INSDECL && opCount == 1 && [edi].operandType == OPER_REG
-		invoke DecReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, sizeOut
+		invoke DecReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSDECL && opCount == 1 && [edi].operandType == OPER_MEM
-		invoke DecMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, sizeOut
+		invoke DecMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, addr sizeOut
 	; inc
 	.elseif instruction == INSINCL && opCount == 1 && [edi].operandType == OPER_REG
-		invoke IncReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, sizeOut
+		invoke IncReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSINCL && opCount == 1 && [edi].operandType == OPER_MEM
-		invoke IncMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, sizeOut
+		invoke IncMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, addr sizeOut
 	; neg
 	.elseif instruction == INSNEGL && opCount == 1 && [edi].operandType == OPER_REG
-		invoke NegReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, sizeOut
+		invoke NegReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSNEGL && opCount == 1 && [edi].operandType == OPER_MEM
-		invoke NegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, sizeOut
+		invoke NegMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, addr sizeOut
 	; not
 	.elseif instruction == INSNOTL && opCount == 1 && [edi].operandType == OPER_REG
-		invoke NotReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, sizeOut
+		invoke NotReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSNOTL && opCount == 1 && [edi].operandType == OPER_MEM
-		invoke NotMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, sizeOut
+		invoke NotMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, addr sizeOut
 	; pop
 	.elseif instruction == INSPUSHL && opCount == 1 && [edi].operandType == OPER_REG
-		invoke PushReg, -1, 1, -1, 0, 0, -1, [edi].sourceReg, startAddr, sizeOut
+		invoke PushReg, -1, 1, -1, 0, 0, -1, [edi].baseReg, startAddr, addr sizeOut
 	.elseif instruction == INSPUSHL && opCount == 1 && [edi].operandType == OPER_MEM
-		invoke PushMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, sizeOut
+		invoke PushMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, addr sizeOut
 	; push
 	.elseif instruction == INSPUSHL && opCount == 1 && [edi].operandType == OPER_REG
-		invoke PushReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, sizeOut
+		invoke PushReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSPUSHL && opCount == 1 && [edi].operandType == OPER_MEM
-		invoke PushMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, sizeOut
+		invoke PushMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, addr sizeOut
+	.elseif instruction == INSPUSHL && opCount == 1 && [edi].operandType == OPER_IMM
+		invoke PushImm, -1, 1, -1, 0, [edi].displacement, -1, -1, startAddr, addr sizeOut
 	; call
 	.elseif instruction == INSCALL && opCount == 1 && [edi].operandType == OPER_REG
-		invoke CallReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, sizeOut
+		invoke CallReg, -1, 1, -1, 0, 0, [edi].baseReg, -1, startAddr, addr sizeOut
 	.elseif instruction == INSCALL && opCount == 1 && [edi].operandType == OPER_MEM
-		invoke CallMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, sizeOut
+		invoke CallMem, [edi].baseReg, [edi].scale, [edi].indexReg, [edi].displacement, 0, -1, -1, startAddr, addr sizeOut
 	; ret
 	.elseif instruction == INSRET && opCount == 0
-		invoke RetOnly, -1, 1, -1, 0, 0, -1, -1, startAddr, sizeOut
+		invoke RetOnly, -1, 1, -1, 0, 0, -1, -1, startAddr, addr sizeOut
 	.else
 		invoke crt_printf, addr invalidInstruction, strAddr
 		mov edi, offset operands

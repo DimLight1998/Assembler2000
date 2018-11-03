@@ -1,4 +1,4 @@
-include ../EncoderUtils.inc
+include EncoderUtils.inc
 
 .code
 ; return the value of REG in MEM-REG-R/M in al

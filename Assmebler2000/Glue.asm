@@ -50,6 +50,9 @@ middleGlue proc uses esi edi ebx
 
 	mov textLength, eax
 
+	.if eax == 0
+		mov eax, 1
+	.endif
 	.while eax > 1000h
 		sub eax, 1000h
 		inc numTextPage
@@ -59,8 +62,8 @@ middleGlue proc uses esi edi ebx
 	.endif
 
 	; set section's base address
-	invoke addBaseAddr, addr textSection, 1000h ; demo prevbug: use initSection and clear all labelTries info
-	invoke initSection, addr textSection, 1000h ; demo
+	invoke addBaseAddr, addr textSection, 401000h ; demo prevbug: use initSection and clear all labelTries info
+	invoke initSection, addr textSection, 401000h ; demo
 
 	mov esi, offset externTries
 	assume edi: ptr TrieNode
@@ -127,6 +130,7 @@ middleGlue proc uses esi edi ebx
 	mov tableNamePointer, eax
 	pop ebx
 	; pointers ready, action!
+	push ecx
 	push ebx
 	mov esi, offset externTries
 	assume edi: ptr TrieNode
@@ -142,13 +146,13 @@ middleGlue proc uses esi edi ebx
 		mov [ebx], eax
 		add tableDllPointer, 4
 		mov ebx, tableDllPointer
-		mov [ebx], 0
+		mov dword ptr [ebx], 0
 		add tableDllPointer, 4
 		mov ebx, tableDllPointer
-		mov [ebx], 0
+		mov dword ptr [ebx], 0
 		add tableDllPointer, 4
 		mov ebx, tableDllPointer
-		mov [ebx], 0 ; fill it later
+		mov dword ptr [ebx], 0 ; fill it later
 		add tableDllPointer, 4
 		mov eax, tableFunc1Pointer
 		sub eax, offset rdataBuffer
@@ -182,7 +186,9 @@ middleGlue proc uses esi edi ebx
 			invoke crt_strcpy, tableNamePointer, addr [edi].nodeStr
 			pop eax
 			add tableNamePointer, eax
-			.if tableNamePointer % 2 != 0
+			mov ecx, 1
+			and ecx, tableNamePointer
+			.if ecx != 0
 				mov ebx, tableNamePointer
 				mov byte ptr [ebx], 0
 				inc tableNamePointer
@@ -194,12 +200,12 @@ middleGlue proc uses esi edi ebx
 
 		; advance tableFunc1Pointer
 		mov ebx, tableFunc1Pointer
-		mov [ebx], 0
+		mov dword ptr [ebx], 0
 		add tableFunc1Pointer, 4
 
 		; advance tableFunc2Pointer
 		mov ebx, tableFunc2Pointer
-		mov [ebx], 0
+		mov dword ptr [ebx], 0
 		add tableFunc2Pointer, 4
 
 		; set up tableDllPointer name field
@@ -219,7 +225,9 @@ middleGlue proc uses esi edi ebx
 		invoke crt_strcpy, tableNamePointer, addr [edi].nodeStr
 		pop eax
 		add tableNamePointer, eax
-		.if tableNamePointer % 2 != 0
+		mov ecx, 1
+		and ecx, tableNamePointer
+		.if ecx != 0
 			mov	ebx, tableNamePointer
 			mov byte ptr [ebx], 0
 			inc tableNamePointer
@@ -229,14 +237,15 @@ middleGlue proc uses esi edi ebx
 		add esi, type dword
 	.endw
 	pop ebx
+	pop ecx
 
 	; finally, insert an empty row to tableDllPointer
 	mov eax, tableDllPointer
-	mov [eax], 0
-	mov [eax + 4], 0
-	mov [eax + 8], 0
-	mov [eax + 12], 0
-	mov [eax + 16], 0
+	mov dword ptr [eax], 0
+	mov dword ptr [eax + 4], 0
+	mov dword ptr [eax + 8], 0
+	mov dword ptr [eax + 12], 0
+	mov dword ptr [eax + 16], 0
 
 	; fill the trie
 	push ebx
@@ -252,11 +261,12 @@ middleGlue proc uses esi edi ebx
 			add eax, rdataBase
 			add tableFunc1Pointer, 4
 			mov ebx, [edi].nodeVal
+			add eax, 400000h
 			mov [edi].nodeVal, eax
 			mov edi, ebx
 		.endw
 		add tableFunc1Pointer, 4
-		add esi, type word
+		add esi, type dword
 	.endw
 	pop ebx
 
@@ -266,11 +276,14 @@ middleGlue proc uses esi edi ebx
 
 	mov rdataLength, eax
 
-	.while eax > 1000h:
+	.if eax == 0
+		mov eax, 1
+	.endif
+	.while eax > 1000h
 		inc numRdataPage
 		sub eax, 1000h
 	.endw
-	.if eax > 1000h:
+	.if eax > 0h
 		inc numRdataPage
 	.endif
 
@@ -287,10 +300,17 @@ middleGlue proc uses esi edi ebx
 	mov dataLength, eax
 
 	push eax
-	invoke addBaseAddr, addr dataSection, dataBase ; demo
-	invoke initSection, addr dataSection, dataBase ; demo
+	mov ebx, dataBase
+	add ebx, 400000h
+	invoke addBaseAddr, addr dataSection, ebx ; demo
+	mov ebx, dataBase
+	add ebx, 400000h
+	invoke initSection, addr dataSection, ebx; demo
 	pop eax
 
+	.if eax == 0
+		mov eax, 1
+	.endif
 	.while eax > 1000h
 		sub eax, 1000h
 		inc numDataPage
@@ -313,45 +333,55 @@ middleGlue endp
     dosStubSize = ($ - dosStub) / type dosStub
 
     peHeader label byte
+	; 0xb0
     peHeaderSignature label byte 
         byte 050h, 045h, 000h, 000h
     peHeaderFileHeader label byte 
         byte 04ch, 001h, 003h, 000h ; machine code and number of sections, we only support three sections
         byte 000h, 000h, 000h, 000h ; timestamp, ignored
         byte 000h, 000h, 000h, 000h ; pointer to symbol table, N/A
+	; 0xc0
         byte 000h, 000h, 000h, 000h ; number of symbols, N/A
         byte 0e0h, 000h, 002h, 000h ; size of optional header and characteristic, all fixed
     peHeaderOptionalHeader label byte
         byte 00bh, 001h, 000h, 000h ; magic number and linker version
         byte 000h, 000h, 000h, 000h ; size of code, ignored
+	; 0xd0
         byte 000h, 000h, 000h, 000h ; size of initialized data, ignored
         byte 000h, 000h, 000h, 000h ; size of uninitialized data, ignored
         byte 000h, 010h, 000h, 000h ; entry of code, fixed to 0x1000, which is page 1
         byte 000h, 000h, 000h, 000h ; base of code, ignored
+	; 0xe0
         byte 000h, 000h, 000h, 000h ; base of data, ignored
         byte 000h, 000h, 040h, 000h ; image base, fixed to 0x400000
         byte 000h, 010h, 000h, 000h ; section alignment, 0x1000 which is 4KB
         byte 000h, 002h, 000h, 000h ; file alignment, 0x200 which is 512B
+	; 0xf0
         byte 000h, 000h, 000h, 000h ; operating system version
         byte 000h, 000h, 000h, 000h ; image version
         byte 004h, 000h, 000h, 000h ; sub system version, fixed to 0x4
         byte 000h, 000h, 000h, 000h ; win32 version, reserved
         sizeOfImageDecideLater label dword
+	; 0x100
         byte    ?,    ?,    ?,    ? ; size of image, decide later
         byte 000h, 004h, 000h, 000h ; size of headers, fixed
         byte 000h, 000h, 000h, 000h ; checksum, set to 0
         byte 003h, 000h, 000h, 000h ; subsystem (set to console) and dll info
+	; 0x110
         byte 000h, 040h, 000h, 000h ; reserved stack size
         byte 000h, 000h, 000h, 000h ; committed stack size
         byte 000h, 040h, 000h, 000h ; reserved heap size
         byte 000h, 000h, 000h, 000h ; committed heap size
+	; 0x120
         byte 000h, 000h, 000h, 000h ; loader flags
         byte 010h, 000h, 000h, 000h ; number of RVA and sizes
         imageDataDirectory label byte
         byte 000h, 000h, 000h, 000h
         byte 000h, 000h, 000h, 000h ; imageDataDirectory zeroth entry
-        imageDataDirectoryFirstEntryDecideLater label dword
+        imageDataDirectoryFirstEntryDecideLaterPart1 label dword
+	; 0x130
         byte    ?,    ?,    ?,    ? ; 
+		imageDataDirectoryFirstEntryDecideLaterPart2 label dword
         byte    ?,    ?,    ?,    ? ; imageDataDirectory first entry
         byte 112 dup(000h)          ; other entries, 14 in total
     peHeaderSize = ($ - peHeader) / type peHeader
@@ -417,29 +447,47 @@ afterGlue proc uses eax ebx ecx edx esi edi
     mov fileHandle, eax
 
     ; generate header
-    invoke WriteFile, fileHandle, addr dosStub, dosStubSize, ebx, 0
-    invoke WriteFile, fileHandle, addr peHeader, peHeaderSize, ebx, 0
-    invoke WriteFile, fileHandle, addr sectionTable, sectionTableSize, ebx, 0
-    invoke WriteFile, fileHandle, addr headerPadding, headerPaddingSize, ebx, 0
+	mov eax, dosStubSize
+    invoke WriteFile, fileHandle, addr dosStub, eax, ebx, 0
+	mov eax, peHeaderSize
+    invoke WriteFile, fileHandle, addr peHeader, eax, ebx, 0
+	mov eax, sectionTableSize
+    invoke WriteFile, fileHandle, addr sectionTable, eax, ebx, 0
+	mov eax, headerPaddingSize
+    invoke WriteFile, fileHandle, addr headerPadding, eax, ebx, 0
 
     ; generate text section
-	mov edi, textSection.sectionContent
-	sub edi, textSection.baseAddress
-	invoke WriteFile, fileHandle, textSection.baseAddress, edi, ebx, 0
+	getSectionLength textSection
+	mov edi, eax
+	invoke WriteFile, fileHandle, addr textSection.sectionContent, edi, ebx, 0
 	; padding
 	mov numTextPageInFile, 0
-	.while edi > 200h:
-		inc numTextPageInFile
-		sub edi, 200h
-	.endw
-	.if edi > 0:
+
+	.if edi == 0
 		mov edx, 200h
-		sub edx, edi
-		.while edx > 0:
+		.while edx > 0
+			push edx
 			invoke WriteFile, fileHandle, addr zero, 1, ebx, 0
+			pop edx
 			dec edx
 		.endw
 		inc numTextPageInFile
+	.else
+		.while edi > 200h
+			inc numTextPageInFile
+			sub edi, 200h
+		.endw
+		.if edi > 0
+			mov edx, 200h
+			sub edx, edi
+			.while edx > 0
+				push edx
+				invoke WriteFile, fileHandle, addr zero, 1, ebx, 0
+				pop edx
+				dec edx
+			.endw
+			inc numTextPageInFile
+		.endif
 	.endif
 	
     ; generate rdata section
@@ -447,38 +495,54 @@ afterGlue proc uses eax ebx ecx edx esi edi
 	; padding
 	mov numRdataPageInFile, 0
 	mov edi, rdataLength
-	.while edi > 200h:
+	.while edi > 200h
 		inc numRdataPageInFile
 		sub edi, 200h
 	.endw
-	.if edi > 0:
+	.if edi > 0
 		mov edx, 200h
 		sub edx, edi
-		.while edx > 0:
+		.while edx > 0
+			push edx
 			invoke WriteFile, fileHandle, addr zero, 1, ebx, 0
+			pop edx
 			dec edx
 		.endw
 		inc numRdataPageInFile
 	.endif
 
     ; generate data section
-	mov edi, dataSection.sectionContent
-	sub edi, dataSection.baseAddress
-	invoke WriteFile, fileHandle, dataSection.baseAddress, edi, ebx, 0
+	getSectionLength dataSection
+	mov edi, eax
+	invoke WriteFile, fileHandle, addr dataSection.sectionContent, edi, ebx, 0
 	; padding
 	mov numDataPageInFile, 0
-	.while edi > 200h:
-		inc numDataPageInFile
-		sub edi, 200h
-	.endw
-	.if edi > 0:
+
+	.if edi == 0
 		mov edx, 200h
-		sub edx, edi
-		.while edx > 0:
+		.while edx > 0
+			push edx
 			invoke WriteFile, fileHandle, addr zero, 1, ebx, 0
+			pop edx
 			dec edx
 		.endw
 		inc numDataPageInFile
+	.else
+		.while edi > 200h
+			inc numDataPageInFile
+			sub edi, 200h
+		.endw
+		.if edi > 0
+			mov edx, 200h
+			sub edx, edi
+			.while edx > 0
+				push edx
+				invoke WriteFile, fileHandle, addr zero, 1, ebx, 0
+				pop edx
+				dec edx
+			.endw
+			inc numDataPageInFile
+		.endif
 	.endif
 
 	; fill header holes
@@ -496,12 +560,10 @@ afterGlue proc uses eax ebx ecx edx esi edi
 	mov eax, importDirectoryTableBeginOffset
 	sub eax, offset rdataBuffer
 	add eax, rdataBase
-	mov imageDataDirectoryFirstEntryDecideLater, eax
-	mov ebx, offset imageDataDirectoryFirstEntryDecideLater
-	add ebx, 4
+	mov imageDataDirectoryFirstEntryDecideLaterPart1, eax
 	mov eax, importDirectoryTableEndOffset
 	sub eax, importDirectoryTableBeginOffset
-	mov [ebx], eax
+	mov imageDataDirectoryFirstEntryDecideLaterPart2, eax
 
 	; text holes
 	mov eax, 1
@@ -510,36 +572,48 @@ afterGlue proc uses eax ebx ecx edx esi edi
 	mov eax, numTextPageInFile
 	imul eax, 200h
 	mov textRawDataSizeDecideLater, eax
-	mov textRawDataOffsetDecideLater, 400h
+	mov textRawDataOffsetDicideLater, 400h
 
 	; rdata holes
 	mov eax, 1
-	add eax, numPageText
+	add eax, numTextPage
 	shl eax, 12
 	mov rdataRvaDecideLater, eax 
 	mov eax, numRdataPageInFile
 	imul eax, 200h
 	mov rdataRawDataSizeDecideLater, eax
-	mov eax, 1
+	mov eax, 2
 	add eax, numTextPageInFile
 	imul eax, 200h
-	mov rdataRawDataOffsetDecideLater, eax
+	mov rdataRawDataOffsetDicideLater, eax
 
 	; data holes
 	mov eax, 1
-	add eax, numPageText
-	add eax, numPageRdata
+	add eax, numTextPage
+	add eax, numRdataPage
 	shl eax, 12
 	mov dataRvaDecideLater, eax 
 	mov eax, numDataPageInFile
 	imul eax, 200h
 	mov dataRawDataSizeDecideLater, eax
-	mov eax, 1
+	mov eax, 2
 	add eax, numTextPageInFile
 	add eax, numRdataPageInFile
 	imul eax, 200h
-	mov dataRawDataOffsetDecideLater, eax
+	mov dataRawDataOffsetDicideLater, eax
 
+	; rewrite
+	invoke SetFilePointer, fileHandle, 0, 0, FILE_BEGIN
+	mov eax, dosStubSize
+    invoke WriteFile, fileHandle, addr dosStub, eax, ebx, 0
+	mov eax, peHeaderSize
+    invoke WriteFile, fileHandle, addr peHeader, eax, ebx, 0
+	mov eax, sectionTableSize
+    invoke WriteFile, fileHandle, addr sectionTable, eax, ebx, 0
+	mov eax, headerPaddingSize
+    invoke WriteFile, fileHandle, addr headerPadding, eax, ebx, 0
+
+	mov eax, fileHandle
     invoke CloseHandle, eax
 	ret
 afterGlue endp
