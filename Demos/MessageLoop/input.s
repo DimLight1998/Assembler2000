@@ -1,10 +1,22 @@
-.import "User32.dll", GetModuleHandleA, LoadIconA
-.import "Kernel32.dll"
+.import "User32.dll",   LoadIconA
+.import "User32.dll",   LoadCursorA
+.import "User32.dll",   RegisterClassA
+.import "User32.dll",   CreateWindowExA
+.import "User32.dll",   ShowWindow
+.import "User32.dll",   UpdateWindow
+.import "User32.dll",   MessageBoxA
+.import "User32.dll",   GetMessageA
+.import "User32.dll",   DispatchMessageA
+.import "User32.dll",   PostQuitMessage
+.import "User32.dll",   DefWindowProcA
+.import "Kernel32.dll", ExitProcess
+.import "Kernel32.dll", GetModuleHandleA
+
 
 COLOR_WINDOW            = 5
 IDI_APPLICATION         = 32512
 IDC_ARROW               = 32512
-INT_MIN                 = -2147483648
+INT_MIN                 = -2147483647 - 1
 COMMON_WINDOW_STYLE     = 294584320
 WM_LBUTTONDOWN          = 513
 WM_CREATE               = 1
@@ -68,7 +80,7 @@ HInstance:              .long 0
     pushl   $0
     call    LoadIconA
     addl    $8, %esp
-    movl    %eax, MainWindowHIcon
+    movl    %eax, MainWinHIcon
     
     pushl   $IDC_ARROW
     pushl   $0
@@ -139,7 +151,7 @@ WinProc:
 
 TEST_EAX_EQ_WM_LBUTTONDOWN:
     cmpl    $WM_LBUTTONDOWN, %eax
-    jz      EAX_EQ_LBUTTONDOWN
+    jz      EAX_EQ_WM_LBUTTONDOWN
     jmp     TEST_EAX_EQ_WM_CREATE
 EAX_EQ_WM_LBUTTONDOWN:
     pushl   $0
