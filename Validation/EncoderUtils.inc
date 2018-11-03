@@ -73,4 +73,7 @@ PushImm proto, memBaseReg: dword, memScale: dword, memIndexReg: dword, memDispla
 CallReg proto, memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword, immediateValue: dword, sourceReg: dword, destinationReg: dword, writeTo: ptr byte, sizeOut: ptr byte
 CallMem proto, memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword, immediateValue: dword, sourceReg: dword, destinationReg: dword, writeTo: ptr byte, sizeOut: ptr byte
 RetOnly proto, memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword, immediateValue: dword, sourceReg: dword, destinationReg: dword, writeTo: ptr byte, sizeOut: ptr byte
-
+JmpReg proto, memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword, immediateValue: dword, sourceReg: dword, destinationReg: dword, writeTo: ptr byte, sizeOut: ptr byte
+JmpRel proto, memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword, immediateValue: dword, sourceReg: dword, destinationReg: dword, writeTo: ptr byte, sizeOut: ptr byte
+JmpMem proto, memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword, immediateValue: dword, sourceReg: dword, destinationReg: dword, writeTo: ptr byte, sizeOut: ptr byte
+JzRel proto, memBaseReg: dword, memScale: dword, memIndexReg: dword, memDisplacement: dword, immediateValue: dword, sourceReg: dword, destinationReg: dword, writeTo: ptr byte, sizeOut: ptr byte
