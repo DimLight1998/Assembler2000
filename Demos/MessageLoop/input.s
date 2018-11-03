@@ -71,27 +71,23 @@ HInstance:              .long 0
 .text
     pushl   $0
     call    GetModuleHandleA
-    # addl    $4, %esp
-
+    
     movl    %eax, HInstance
     movl    %eax, MainWinHInstance
 
     pushl   $IDI_APPLICATION
     pushl   $0
     call    LoadIconA
-    # addl    $8, %esp
     movl    %eax, MainWinHIcon
     
     pushl   $IDC_ARROW
     pushl   $0
     call    LoadCursorA
-    # addl    $8, %esp
     movl    %eax, MainWinHCursor
 
     pushl   $MainWin
     call    RegisterClassA
-    # addl    $4, %esp
-
+    
     pushl   $0
     pushl   HInstance
     pushl   $0
@@ -105,45 +101,38 @@ HInstance:              .long 0
     pushl   $ClassName
     pushl   $0
     call    CreateWindowExA
-    # addl    $48, %esp
     movl    %eax, HMainWnd
 
     pushl   $5
     pushl   HMainWnd
     call    ShowWindow
-    # addl    $8, %esp
     pushl   HMainWnd
     call    UpdateWindow
-    # addl    $4, %esp
-
+    
     pushl   $0
     pushl   $GreetTitle
     pushl   $GreetText
     pushl   HMainWnd
     call    MessageBoxA
-    # addl    $16, %esp
-
+    
 MessageLoop:
     pushl   $0
     pushl   $0
     pushl   $0
     pushl   $Msg
     call    GetMessageA
-    # addl    $16, %esp
-
+    
     cmpl    $0, %eax
     jz      ExitProgram
     
     pushl   $Msg
     call    DispatchMessageA
-    # addl    $4, %esp
     jmp     MessageLoop
 
 ExitProgram:
     pushl   $0
     call    ExitProcess
-    # addl    $4, %esp
-
+    
 WinProc:
     pushl   %ebp
     movl    %esp, %ebp
@@ -160,7 +149,6 @@ EAX_EQ_WM_LBUTTONDOWN:
     pushl   $PopupText
     pushl   8(%ebp)
     call    MessageBoxA
-    # addl    $16, %esp
     jmp     WINPROC_EXIT
 TEST_EAX_EQ_WM_CREATE:
     cmpl    $WM_CREATE, %eax
@@ -172,7 +160,6 @@ EAX_EQ_WM_CREATE:
     pushl   $AppLoadMsgText
     pushl   8(%ebp)
     call    MessageBoxA
-    # addl    $16, %esp
     jmp     WINPROC_EXIT
 TEST_EAX_EQ_WM_CLOSE:
     cmpl    $WM_CLOSE, %eax
@@ -184,13 +171,12 @@ EAX_EQ_WM_CLOSE:
     pushl   $CloseMsg
     pushl   8(%ebp)
     call    MessageBoxA
-    # addl    $16, %esp
-    
+        
     pushl   $0
     call    PostQuitMessage
-    # addl    $4, %esp
+    jmp     WINPROC_EXIT
 TEST_EAX_EQ_WM_KEYDOWN:
-    cmpl    $WM_CREATE, %eax
+    cmpl    $WM_KEYDOWN, %eax
     jz      EAX_EQ_WM_KEYDOWN
     jmp     WINPROC_ELSE
 EAX_EQ_WM_KEYDOWN:
@@ -199,7 +185,6 @@ EAX_EQ_WM_KEYDOWN:
     pushl   $IAmHitText
     pushl   8(%ebp)
     call    MessageBoxA
-    # addl    $16, %esp
     jmp     WINPROC_EXIT
 WINPROC_ELSE: 
     pushl   20(%ebp)
@@ -207,7 +192,6 @@ WINPROC_ELSE:
     pushl   12(%ebp)
     pushl   8(%ebp)
     call    DefWindowProcA
-    # addl    $16, %esp
     jmp     WINPROC_EXIT
 WINPROC_EXIT:
     movl    %ebp, %esp
