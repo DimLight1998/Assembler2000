@@ -431,11 +431,14 @@ middleGlue endp
     headerPadding label byte
         byte 480 dup(00h)
     headerPaddingSize = ($ - headerPadding) / type headerPadding
-    fileName byte "output.exe", 0
 
 	zero byte 0, 0, 0
 .code
 
+
+.data
+	cannotOpenOutput byte "cannot open output file: %s", 10, 0
+.code
 afterGlue proc uses eax ebx ecx edx esi edi
 	; write the content of textSection and dataSection to the output PE file
 	local fileHandle: dword
@@ -443,8 +446,12 @@ afterGlue proc uses eax ebx ecx edx esi edi
 	local numRdataPageInFile: dword
 	local numDataPageInFile: dword
 
-    invoke CreateFile, addr fileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0
+    invoke CreateFile, addr outFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0
     mov fileHandle, eax
+	.if !fileHandle
+		invoke crt_printf, addr cannotOpenOutput, addr outFileName
+		ret
+	.endif
 
     ; generate header
 	mov eax, dosStubSize

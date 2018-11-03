@@ -20,6 +20,7 @@ externdef textSection: Section, dataSection: Section
 externdef currentSection: dword
 externdef parseCount: dword
 externdef externTries: dword, currentExtern: dword
+externdef inFileName: byte, outFileName: byte
 
 
 addSectionLocation proto, sectionAddr: dword, difference: dword
